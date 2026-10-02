@@ -439,64 +439,41 @@ function About() {
       id="about"
       className="w-full border-t border-border/60 bg-surface/40"
     >
-      <div className="mx-auto grid w-full max-w-7xl grid-cols-1 items-center gap-16 px-6 pb-16 pt-28 lg:grid-cols-[2fr_3fr] lg:px-10 lg:pb-20 lg:pt-36">
+      <div className="mx-auto flex w-full max-w-3xl flex-col items-center px-6 py-28 text-center lg:py-36">
         <Reveal>
-          <div className="relative mx-auto max-w-sm lg:max-w-none">
-            <div className="absolute -inset-3 rounded-lg border border-primary/25" />
+          <div className="relative">
             <img
               src={portrait}
-              alt="Paul Comaïta dans son studio"
-              width={896}
-              height={1152}
+              alt="Paul Comaïta"
+              width={112}
+              height={112}
               loading="lazy"
-              className="relative w-full rounded-lg object-cover grayscale-[35%]"
+              className="size-24 rounded-full object-cover grayscale-[45%] ring-1 ring-border sm:size-28"
+            />
+            <span
+              className="absolute -inset-2 -z-10 rounded-full bg-primary/10 blur-xl"
+              aria-hidden="true"
             />
           </div>
         </Reveal>
 
-        <div>
-          <Reveal>
-            <p className="text-[12px] tracking-[0.35em] uppercase text-primary">
-              About
-            </p>
-            <h2 className="mt-4 font-display text-4xl font-medium tracking-tight text-foreground sm:text-5xl">
-              La 3D au service de l&apos;image de marque
-            </h2>
-          </Reveal>
-          <Reveal delay={120}>
-            <p className="mt-8 max-w-2xl text-base font-light leading-relaxed text-muted-foreground">
-              Artiste 3D et directeur artistique, je conçois des images de
-              synthèse qui donnent aux marques une présence cinématographique.
-              De la publicité produit aux films motion design, je pilote chaque
-              étape — modélisation, lookdev, éclairage, animation et compositing
-              — avec une obsession : le détail qui fait mouche.
-            </p>
-            <p className="mt-5 max-w-2xl text-base font-light leading-relaxed text-muted-foreground">
-              Basé à Paris, je collabore avec des studios, des agences et des
-              marques en direct, en France et à l&apos;international.
-            </p>
-          </Reveal>
-
-          <Reveal delay={280}>
-            <dl className="mt-12 grid grid-cols-3 gap-6 border-t border-border/60 pt-10">
-              {[
-                { value: "8+", label: "Années d'expérience" },
-                { value: "120+", label: "Projets livrés" },
-                { value: "40+", label: "Marques accompagnées" },
-              ].map((stat) => (
-                <div key={stat.label}>
-                  <dt className="sr-only">{stat.label}</dt>
-                  <dd className="font-display text-3xl font-medium text-foreground sm:text-4xl">
-                    {stat.value}
-                  </dd>
-                  <dd className="mt-2 text-[13px] font-light text-muted-foreground">
-                    {stat.label}
-                  </dd>
-                </div>
-              ))}
-            </dl>
-          </Reveal>
-        </div>
+        <Reveal delay={120}>
+          <p className="mt-10 text-[12px] tracking-[0.35em] uppercase text-primary">
+            À propos
+          </p>
+          <h2 className="mt-4 font-display text-3xl font-medium tracking-tight text-foreground sm:text-4xl">
+            Qui suis-je ?
+          </h2>
+          <p className="mx-auto mt-8 max-w-[660px] text-[17px] font-light leading-[1.8] text-foreground/75">
+            Je suis artiste 3D spécialisé en publicité et direction artistique.
+            Passionné par la création d&apos;images immersives et la narration
+            visuelle, j&apos;explore le potentiel de la 3D dans la publicité,
+            la motion graphics et l&apos;animation produit.
+          </p>
+          <p className="mx-auto mt-6 text-[15px] font-light tracking-wide text-muted-foreground">
+            Master en 3D Animation &amp; Production — IIM
+          </p>
+        </Reveal>
       </div>
 
       <Expertise />
