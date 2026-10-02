@@ -439,38 +439,38 @@ function About() {
       id="about"
       className="w-full border-t border-border/60 bg-surface/40"
     >
-      <div className="mx-auto flex w-full max-w-3xl flex-col items-center px-6 py-28 text-center lg:py-36">
-        <Reveal>
+      <div className="mx-auto grid w-full max-w-5xl grid-cols-1 items-center gap-12 px-6 py-28 sm:gap-16 lg:grid-cols-[300px_1fr] lg:gap-24 lg:py-36">
+        <Reveal className="justify-self-center lg:justify-self-start">
           <div className="relative">
             <img
               src={portrait}
               alt="Paul Comaïta"
-              width={112}
-              height={112}
+              width={300}
+              height={360}
               loading="lazy"
-              className="size-24 rounded-full object-cover grayscale-[45%] ring-1 ring-border sm:size-28"
+              className="aspect-[5/6] w-[260px] rounded-2xl object-cover grayscale-[35%] ring-1 ring-primary/50 sm:w-[300px]"
             />
             <span
-              className="absolute -inset-2 -z-10 rounded-full bg-primary/10 blur-xl"
+              className="absolute -inset-3 -z-10 rounded-3xl bg-primary/10 blur-2xl"
               aria-hidden="true"
             />
           </div>
         </Reveal>
 
         <Reveal delay={120}>
-          <p className="mt-10 text-[12px] tracking-[0.35em] uppercase text-primary">
+          <p className="text-[12px] tracking-[0.35em] uppercase text-primary">
             À propos
           </p>
           <h2 className="mt-4 font-display text-3xl font-medium tracking-tight text-foreground sm:text-4xl">
             Qui suis-je ?
           </h2>
-          <p className="mx-auto mt-8 max-w-[660px] text-[17px] font-light leading-[1.8] text-foreground/75">
+          <p className="mt-8 max-w-[620px] text-[17px] font-light leading-[1.8] text-foreground/75">
             Je suis artiste 3D spécialisé en publicité et direction artistique.
             Passionné par la création d&apos;images immersives et la narration
             visuelle, j&apos;explore le potentiel de la 3D dans la publicité,
             la motion graphics et l&apos;animation produit.
           </p>
-          <p className="mx-auto mt-6 text-[15px] font-light tracking-wide text-muted-foreground">
+          <p className="mt-6 text-[15px] font-light tracking-wide text-muted-foreground">
             Master en 3D Animation &amp; Production — IIM
           </p>
         </Reveal>
