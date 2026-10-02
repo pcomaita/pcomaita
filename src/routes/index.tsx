@@ -136,13 +136,21 @@ const PROJECTS: Project[] = [
   },
 ];
 
-const SKILLS = [
-  "Blender",
-  "Cinema 4D",
-  "Houdini",
-  "After Effects",
-  "Octane Render",
-  "Nuke",
+const DISCIPLINES = [
+  "3D Modeling",
+  "Texturing",
+  "Lighting",
+  "Compositing",
+  "Motion Graphics",
+  "Art Direction",
+  "Product Animation",
+];
+
+const TOOLS = [
+  { name: "Blender", level: 95 },
+  { name: "DaVinci Resolve", level: 90 },
+  { name: "Photoshop", level: 88 },
+  { name: "Nuke", level: 85 },
 ];
 
 function SiteNav() {
