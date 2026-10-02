@@ -571,6 +571,13 @@ function Expertise() {
   );
 }
 
+const CONTACT_SOCIALS = [
+  { label: "ArtStation", href: "https://artstation.com" },
+  { label: "Instagram", href: "https://instagram.com" },
+  { label: "LinkedIn", href: "https://linkedin.com" },
+  { label: "Malt", href: "https://malt.fr" },
+];
+
 function Contact() {
   return (
     <section
@@ -584,21 +591,35 @@ function Contact() {
             Contact
           </p>
           <h2 className="mt-6 font-display text-5xl font-medium tracking-tight text-foreground sm:text-6xl">
-            Donnons vie à votre
-            <br />
-            prochaine campagne
+            Parlons de ton projet
           </h2>
           <p className="mx-auto mt-6 max-w-md text-base font-light text-muted-foreground">
-            Disponible pour des collaborations en publicité, motion design et
-            animation produit.
+            Publicité, motion design, animation produit — racontez-moi votre
+            idée, je m&apos;occupe de lui donner vie.
           </p>
           <a
             href="mailto:hello@paulcomaita.com"
-            className="mt-10 inline-flex items-center gap-3 rounded-full bg-primary px-8 py-3.5 text-sm font-medium tracking-wide text-primary-foreground transition-all hover:opacity-90"
+            className="group mt-10 inline-flex items-center gap-3 rounded-full border border-foreground/80 bg-transparent px-8 py-3.5 text-sm font-medium tracking-wide text-foreground transition-all duration-300 hover:scale-[1.05] hover:border-foreground hover:bg-foreground hover:text-background"
           >
-            hello@paulcomaita.com
-            <ArrowUpRight className="size-4" />
+            Me contacter
+            <ArrowUpRight className="size-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
           </a>
+
+          <ul className="mt-12 flex flex-wrap items-center justify-center gap-x-8 gap-y-4">
+            {CONTACT_SOCIALS.map(({ label, href }) => (
+              <li key={label}>
+                <a
+                  href={href}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="group inline-flex items-center gap-1.5 text-[13px] tracking-[0.14em] uppercase text-muted-foreground transition-colors duration-300 hover:text-primary"
+                >
+                  {label}
+                  <ArrowUpRight className="size-3.5 opacity-0 transition-all duration-300 group-hover:opacity-100" />
+                </a>
+              </li>
+            ))}
+          </ul>
         </Reveal>
       </div>
     </section>
