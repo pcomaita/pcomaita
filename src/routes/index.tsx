@@ -478,17 +478,7 @@ function About() {
           </Reveal>
 
           <Reveal delay={200}>
-            <ul className="mt-10 flex flex-wrap gap-2.5">
-              {SKILLS.map((skill) => (
-                <li
-                  key={skill}
-                  className="rounded-full border border-border bg-background px-4 py-1.5 text-[13px] font-light text-muted-foreground"
-                >
-                  {skill}
-                </li>
-              ))}
-            </ul>
-          </Reveal>
+
 
           <Reveal delay={280}>
             <dl className="mt-12 grid grid-cols-3 gap-6 border-t border-border/60 pt-10">
