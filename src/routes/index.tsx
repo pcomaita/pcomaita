@@ -439,7 +439,7 @@ function About() {
       id="about"
       className="w-full border-t border-border/60 bg-surface/40"
     >
-      <div className="mx-auto grid w-full max-w-7xl grid-cols-1 items-center gap-16 px-6 py-28 lg:grid-cols-[2fr_3fr] lg:px-10 lg:py-36">
+      <div className="mx-auto grid w-full max-w-7xl grid-cols-1 items-center gap-16 px-6 pb-16 pt-28 lg:grid-cols-[2fr_3fr] lg:px-10 lg:pb-20 lg:pt-36">
         <Reveal>
           <div className="relative mx-auto max-w-sm lg:max-w-none">
             <div className="absolute -inset-3 rounded-lg border border-primary/25" />
@@ -476,9 +476,6 @@ function About() {
               marques en direct, en France et à l&apos;international.
             </p>
           </Reveal>
-
-          <Reveal delay={200}>
-
 
           <Reveal delay={280}>
             <dl className="mt-12 grid grid-cols-3 gap-6 border-t border-border/60 pt-10">
