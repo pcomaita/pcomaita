@@ -3,11 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import {
   ArrowDown,
   ArrowUpRight,
-  Dribbble,
-  Instagram,
-  Linkedin,
   Play,
-  Twitter,
   X,
 } from "lucide-react";
 import { HeroScene } from "@/components/HeroScene";
