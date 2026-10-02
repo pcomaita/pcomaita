@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import {
   ArrowDown,
@@ -5,7 +6,9 @@ import {
   Dribbble,
   Instagram,
   Linkedin,
+  Play,
   Twitter,
+  X,
 } from "lucide-react";
 import { HeroScene } from "@/components/HeroScene";
 import { Reveal } from "@/components/Reveal";
@@ -13,6 +16,8 @@ import workParfum from "@/assets/work-parfum.jpg";
 import workSneaker from "@/assets/work-sneaker.jpg";
 import workWatch from "@/assets/work-watch.jpg";
 import workMotion from "@/assets/work-motion.jpg";
+import workNebula from "@/assets/work-nebula.jpg";
+import workHeadphones from "@/assets/work-headphones.jpg";
 import portrait from "@/assets/portrait.jpg";
 
 export const Route = createFileRoute("/")({
@@ -45,30 +50,89 @@ const NAV_LINKS = [
   { label: "Contact", href: "#contact" },
 ];
 
-const PROJECTS = [
+const CATEGORIES = [
+  "Tous",
+  "Advertising",
+  "Product Animation",
+  "Motion Graphics",
+  "CG/Cinematic",
+] as const;
+type Category = (typeof CATEGORIES)[number];
+
+interface Project {
+  title: string;
+  category: Exclude<Category, "Tous">;
+  year: string;
+  image: string;
+  description: string;
+  context: string;
+  tools: string[];
+  isVideo?: boolean;
+}
+
+const PROJECTS: Project[] = [
   {
     title: "Vélora Paris",
-    category: "Publicité produit",
+    category: "Advertising",
     year: "2026",
     image: workParfum,
+    description: "Film publicitaire produit pour un parfum de niche",
+    context:
+      "Film de lancement pour la nouvelle fragrance de Vélora Paris. Rendu entièrement en 3D — flacon, liquides et matières — avec une direction artistique lumineuse pensée pour les réseaux sociaux et le cinéma.",
+    tools: ["Blender", "Octane Render", "After Effects"],
   },
   {
     title: "Liquid Chrome",
-    category: "Motion design",
+    category: "Motion Graphics",
     year: "2025",
     image: workMotion,
+    description: "Exploration de chrome liquide et simulation de fluides",
+    context:
+      "Pièce motion design personnelle explorant le chrome liquide et les simulations de fluides. Cycle complet : simulation Houdini, lookdev, éclairage et compositing.",
+    tools: ["Houdini", "Cinema 4D", "Redshift", "Nuke"],
+    isVideo: true,
   },
   {
     title: "Pulse Watch",
-    category: "Animation produit",
+    category: "Product Animation",
     year: "2025",
     image: workWatch,
+    description: "Animation produit macro pour une montre connectée",
+    context:
+      "Animation produit pour le lancement d'une montre connectée : vues macro sur les matériaux, éclaté du boîtier et mise en scène du cadran, déclinée en formats 16:9 et 9:16.",
+    tools: ["Blender", "Cycles", "After Effects"],
+    isVideo: true,
   },
   {
     title: "Kinetic X1",
-    category: "Campagne sneakers",
+    category: "Advertising",
     year: "2024",
     image: workSneaker,
+    description: "Campagne sneakers — key visuals & boucles sociales",
+    context:
+      "Campagne publicitaire pour une sneaker en édition limitée. Key visuals et boucles animées pour les réseaux sociaux, à partir du scan 3D du produit réel.",
+    tools: ["Cinema 4D", "Octane Render", "Nuke"],
+  },
+  {
+    title: "Nébula",
+    category: "CG/Cinematic",
+    year: "2025",
+    image: workNebula,
+    description: "Court-métrage CG — chrome, brume et lumière cyan",
+    context:
+      "Exploration cinématographique personnelle : nébuleuse de chrome liquide traversée de brume lumineuse. Rendu en résolution 4K avec grading filmique.",
+    tools: ["Houdini", "Karma", "DaVinci Resolve"],
+    isVideo: true,
+  },
+  {
+    title: "Drift Audio",
+    category: "Product Animation",
+    year: "2024",
+    image: workHeadphones,
+    description: "Film produit pour un casque audio premium",
+    context:
+      "Film d'animation produit pour un casque sans fil haut de gamme : rotation studio, focus matériaux et détail des mousses, pensé pour l'e-commerce et la publicité en ligne.",
+    tools: ["Blender", "Octane Render", "After Effects"],
   },
 ];
 
@@ -170,7 +234,101 @@ function Hero() {
   );
 }
 
-function Work() {
+function ProjectModal({
+  project,
+  onClose,
+}: {
+  project: Project;
+  onClose: () => void;
+}) {
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", onKey);
+    document.body.style.overflow = "hidden";
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      document.body.style.overflow = "";
+    };
+  }, [onClose]);
+
+  return (
+    <div
+      className="fixed inset-0 z-[70] flex items-center justify-center p-4 sm:p-8"
+      role="dialog"
+      aria-modal="true"
+      aria-label={`Projet ${project.title}`}
+    >
+      <div
+        className="absolute inset-0 animate-in fade-in duration-300 bg-background/85 backdrop-blur-sm"
+        onClick={onClose}
+      />
+      <div className="animate-in fade-in zoom-in-95 duration-300 shadow-soft relative max-h-full w-full max-w-3xl overflow-y-auto rounded-lg border border-border/60 bg-surface">
+        <button
+          onClick={onClose}
+          aria-label="Fermer"
+          className="absolute right-4 top-4 z-10 flex size-9 items-center justify-center rounded-full border border-border bg-background/70 text-foreground backdrop-blur-sm transition-colors duration-300 hover:border-primary/50 hover:text-primary"
+        >
+          <X className="size-4" />
+        </button>
+
+        <div className="relative aspect-video overflow-hidden">
+          <img
+            src={project.image}
+            alt={`${project.title} — ${project.category}`}
+            width={1280}
+            height={720}
+            className="h-full w-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-surface via-transparent to-transparent" />
+        </div>
+
+        <div className="px-6 pb-8 pt-4 sm:px-8">
+          <p className="text-[11px] tracking-[0.3em] uppercase text-primary">
+            {project.category} · {project.year}
+          </p>
+          <h3 className="mt-3 font-display text-2xl font-medium tracking-tight text-foreground sm:text-3xl">
+            {project.title}
+          </h3>
+          <p className="mt-4 max-w-2xl text-sm font-light leading-relaxed text-muted-foreground sm:text-base">
+            {project.context}
+          </p>
+
+          <div className="mt-6 flex flex-wrap gap-2">
+            {project.tools.map((tool) => (
+              <span
+                key={tool}
+                className="rounded-full border border-border bg-background px-3.5 py-1.5 text-[12px] font-light text-muted-foreground"
+              >
+                {tool}
+              </span>
+            ))}
+          </div>
+
+          <a
+            href="#contact"
+            onClick={onClose}
+            className="group mt-8 inline-flex items-center gap-2.5 rounded-full bg-foreground px-6 py-2.5 text-sm font-medium tracking-wide text-background transition-all duration-300 hover:bg-primary hover:text-primary-foreground"
+          >
+            Discuter d&apos;un projet similaire
+            <ArrowUpRight className="size-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+          </a>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Portfolio() {
+  const [activeCategory, setActiveCategory] = useState<Category>("Tous");
+  const [selected, setSelected] = useState<Project | null>(null);
+
+  const visible =
+    activeCategory === "Tous"
+      ? PROJECTS
+      : PROJECTS.filter((p) => p.category === activeCategory);
+
   return (
     <section id="work" className="w-full border-t border-border/60">
       <div className="mx-auto w-full max-w-7xl px-6 py-28 lg:px-10 lg:py-36">
@@ -191,12 +349,34 @@ function Work() {
           </div>
         </Reveal>
 
-        <div className="mt-16 grid grid-cols-1 gap-8 md:grid-cols-2">
-          {PROJECTS.map((project, i) => (
-            <Reveal key={project.title} delay={(i % 2) * 120}>
-              <a
-                href="#contact"
-                className="group block overflow-hidden rounded-lg border border-border/60 bg-surface"
+        <Reveal delay={120}>
+          <div className="mt-12 flex flex-wrap gap-2.5" role="group" aria-label="Filtres de projets">
+            {CATEGORIES.map((category) => {
+              const isActive = category === activeCategory;
+              return (
+                <button
+                  key={category}
+                  onClick={() => setActiveCategory(category)}
+                  aria-pressed={isActive}
+                  className={`rounded-full border px-4 py-1.5 text-[13px] tracking-[0.08em] transition-all duration-300 ${
+                    isActive
+                      ? "border-primary bg-primary text-primary-foreground"
+                      : "border-border bg-background text-muted-foreground hover:border-primary/40 hover:text-foreground"
+                  }`}
+                >
+                  {category}
+                </button>
+              );
+            })}
+          </div>
+        </Reveal>
+
+        <div className="mt-12 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+          {visible.map((project, i) => (
+            <Reveal key={project.title} delay={(i % 3) * 100}>
+              <button
+                onClick={() => setSelected(project)}
+                className="group block h-full w-full overflow-hidden rounded-lg border border-border/60 bg-surface text-left shadow-soft transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:bg-surface-raised"
               >
                 <div className="relative aspect-video overflow-hidden">
                   <img
@@ -208,28 +388,39 @@ function Work() {
                     className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-background/70 via-transparent to-transparent opacity-80" />
-                  <span className="absolute right-5 top-5 flex size-10 items-center justify-center rounded-full border border-foreground/20 bg-background/40 text-foreground opacity-0 backdrop-blur-sm transition-opacity duration-300 group-hover:opacity-100">
-                    <ArrowUpRight className="size-4" />
+                  <span className="absolute inset-0 flex items-center justify-center bg-background/30 opacity-0 backdrop-blur-[2px] transition-opacity duration-300 group-hover:opacity-100">
+                    <span className="flex items-center gap-2 rounded-full border border-border/60 bg-background/70 px-4 py-2 text-[11px] tracking-[0.16em] uppercase text-foreground">
+                      {project.isVideo ? (
+                        <Play className="size-3.5" />
+                      ) : (
+                        <ArrowUpRight className="size-3.5" />
+                      )}
+                      {project.isVideo ? "Voir la vidéo" : "Voir le projet"}
+                    </span>
                   </span>
                 </div>
-                <div className="flex items-baseline justify-between px-6 py-5">
-                  <div>
-                    <h3 className="font-display text-lg font-medium text-foreground">
+                <div className="px-5 py-5">
+                  <div className="flex items-baseline justify-between gap-4">
+                    <h3 className="font-display text-base font-medium text-foreground sm:text-lg">
                       {project.title}
                     </h3>
-                    <p className="mt-1 text-sm font-light text-muted-foreground">
-                      {project.category}
-                    </p>
+                    <span className="text-sm font-light text-muted-foreground">
+                      {project.year}
+                    </span>
                   </div>
-                  <span className="text-sm font-light text-muted-foreground">
-                    {project.year}
-                  </span>
+                  <p className="mt-1.5 text-sm font-light leading-relaxed text-muted-foreground">
+                    {project.description}
+                  </p>
                 </div>
-              </a>
+              </button>
             </Reveal>
           ))}
         </div>
       </div>
+
+      {selected && (
+        <ProjectModal project={selected} onClose={() => setSelected(null)} />
+      )}
     </section>
   );
 }
@@ -389,7 +580,7 @@ function Index() {
       <SiteNav />
       <main>
         <Hero />
-        <Work />
+        <Portfolio />
         <About />
         <Contact />
       </main>

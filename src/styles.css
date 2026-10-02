@@ -162,6 +162,11 @@
   animation: scroll-hint 2.2s cubic-bezier(0.65, 0, 0.35, 1) infinite;
 }
 
+/* Subtle drop shadow for portfolio cards & modal */
+.shadow-soft {
+  box-shadow: 0 20px 50px -20px oklch(0 0 0 / 0.55);
+}
+
 /* Subtle grain overlay for cinematic depth */
 .grain::before {
   content: "";
