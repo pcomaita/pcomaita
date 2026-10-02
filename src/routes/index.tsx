@@ -627,12 +627,6 @@ function Contact() {
 }
 
 function Footer() {
-  const socials = [
-    { label: "Instagram", href: "https://instagram.com", Icon: Instagram },
-    { label: "Twitter", href: "https://twitter.com", Icon: Twitter },
-    { label: "LinkedIn", href: "https://linkedin.com", Icon: Linkedin },
-    { label: "Dribbble", href: "https://dribbble.com", Icon: Dribbble },
-  ];
   return (
     <footer className="w-full border-t border-border/60">
       <div className="mx-auto flex w-full max-w-7xl flex-col items-center justify-between gap-6 px-6 py-10 sm:flex-row lg:px-10">
@@ -640,16 +634,15 @@ function Footer() {
           © 2026 Paul Comaïta — Tous droits réservés
         </p>
         <ul className="flex items-center gap-5">
-          {socials.map(({ label, href, Icon }) => (
+          {CONTACT_SOCIALS.map(({ label, href }) => (
             <li key={label}>
               <a
                 href={href}
                 target="_blank"
                 rel="noreferrer"
-                aria-label={label}
-                className="flex size-9 items-center justify-center rounded-full border border-border text-muted-foreground transition-colors hover:border-primary/50 hover:text-primary"
+                className="text-[12px] tracking-[0.14em] uppercase text-muted-foreground transition-colors duration-300 hover:text-primary"
               >
-                <Icon className="size-4" />
+                {label}
               </a>
             </li>
           ))}
