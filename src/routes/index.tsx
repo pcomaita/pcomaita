@@ -8,30 +8,26 @@ import {
 } from "lucide-react";
 import { HeroScene } from "@/components/HeroScene";
 import { Reveal } from "@/components/Reveal";
-import workParfum from "@/assets/work-parfum.jpg";
-import workSneaker from "@/assets/work-sneaker.jpg";
-import workWatch from "@/assets/work-watch.jpg";
-import workMotion from "@/assets/work-motion.jpg";
-import workNebula from "@/assets/work-nebula.jpg";
-import workHeadphones from "@/assets/work-headphones.jpg";
-import portrait from "@/assets/portrait.jpg";
+import {
+  categories,
+  profile,
+  projects,
+  type Project,
+  type ProjectCategory,
+  type ProjectClient,
+} from "@/data/projects";
+
+const DESCRIPTION =
+  "Advertising, motion graphics and product animation — explore the 3D work of Paul Comaïta.";
 
 export const Route = createFileRoute("/")({
   ssr: false, // WebGL hero canvas — client-only
   head: () => ({
     meta: [
       { title: "Paul Comaïta — 3D Artist & Art Director" },
-      {
-        name: "description",
-        content:
-          "Publicité, motion graphics et animation produit — découvrez l'univers 3D de Paul Comaïta.",
-      },
+      { name: "description", content: DESCRIPTION },
       { property: "og:title", content: "Paul Comaïta — 3D Artist & Art Director" },
-      {
-        property: "og:description",
-        content:
-          "Publicité, motion graphics et animation produit — découvrez l'univers 3D de Paul Comaïta.",
-      },
+      { property: "og:description", content: DESCRIPTION },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -46,91 +42,42 @@ const NAV_LINKS = [
   { label: "Contact", href: "#contact" },
 ];
 
-const CATEGORIES = [
-  "Tous",
-  "Advertising",
-  "Product Animation",
-  "Motion Graphics",
-  "CG/Cinematic",
-] as const;
-type Category = (typeof CATEGORIES)[number];
+type Filter = "All" | ProjectCategory;
+const FILTERS: Filter[] = ["All", ...categories];
 
-interface Project {
-  title: string;
-  category: Exclude<Category, "Tous">;
-  year: string;
-  image: string;
-  description: string;
-  context: string;
-  tools: string[];
-  isVideo?: boolean;
+const EXT = { target: "_blank", rel: "noopener noreferrer" } as const;
+
+function ClientLine({ client }: { client: ProjectClient }) {
+  return (
+    <div className="mt-3 text-[13px] font-light leading-relaxed">
+      <p className="text-foreground/85">
+        Client:{" "}
+        <a
+          href={client.url}
+          {...EXT}
+          onClick={(e) => e.stopPropagation()}
+          className="underline-offset-4 transition-colors duration-300 hover:text-primary hover:underline"
+        >
+          {client.name}
+        </a>
+      </p>
+      <p className="mt-0.5 text-muted-foreground">
+        {client.contextUrl ? (
+          <a
+            href={client.contextUrl}
+            {...EXT}
+            onClick={(e) => e.stopPropagation()}
+            className="underline-offset-4 transition-colors duration-300 hover:text-primary hover:underline"
+          >
+            {client.context}
+          </a>
+        ) : (
+          client.context
+        )}
+      </p>
+    </div>
+  );
 }
-
-const PROJECTS: Project[] = [
-  {
-    title: "Vélora Paris",
-    category: "Advertising",
-    year: "2026",
-    image: workParfum,
-    description: "Film publicitaire produit pour un parfum de niche",
-    context:
-      "Film de lancement pour la nouvelle fragrance de Vélora Paris. Rendu entièrement en 3D — flacon, liquides et matières — avec une direction artistique lumineuse pensée pour les réseaux sociaux et le cinéma.",
-    tools: ["Blender", "Octane Render", "After Effects"],
-  },
-  {
-    title: "Liquid Chrome",
-    category: "Motion Graphics",
-    year: "2025",
-    image: workMotion,
-    description: "Exploration de chrome liquide et simulation de fluides",
-    context:
-      "Pièce motion design personnelle explorant le chrome liquide et les simulations de fluides. Cycle complet : simulation Houdini, lookdev, éclairage et compositing.",
-    tools: ["Houdini", "Cinema 4D", "Redshift", "Nuke"],
-    isVideo: true,
-  },
-  {
-    title: "Pulse Watch",
-    category: "Product Animation",
-    year: "2025",
-    image: workWatch,
-    description: "Animation produit macro pour une montre connectée",
-    context:
-      "Animation produit pour le lancement d'une montre connectée : vues macro sur les matériaux, éclaté du boîtier et mise en scène du cadran, déclinée en formats 16:9 et 9:16.",
-    tools: ["Blender", "Cycles", "After Effects"],
-    isVideo: true,
-  },
-  {
-    title: "Kinetic X1",
-    category: "Advertising",
-    year: "2024",
-    image: workSneaker,
-    description: "Campagne sneakers — key visuals & boucles sociales",
-    context:
-      "Campagne publicitaire pour une sneaker en édition limitée. Key visuals et boucles animées pour les réseaux sociaux, à partir du scan 3D du produit réel.",
-    tools: ["Cinema 4D", "Octane Render", "Nuke"],
-  },
-  {
-    title: "Nébula",
-    category: "CG/Cinematic",
-    year: "2025",
-    image: workNebula,
-    description: "Court-métrage CG — chrome, brume et lumière cyan",
-    context:
-      "Exploration cinématographique personnelle : nébuleuse de chrome liquide traversée de brume lumineuse. Rendu en résolution 4K avec grading filmique.",
-    tools: ["Houdini", "Karma", "DaVinci Resolve"],
-    isVideo: true,
-  },
-  {
-    title: "Drift Audio",
-    category: "Product Animation",
-    year: "2024",
-    image: workHeadphones,
-    description: "Film produit pour un casque audio premium",
-    context:
-      "Film d'animation produit pour un casque sans fil haut de gamme : rotation studio, focus matériaux et détail des mousses, pensé pour l'e-commerce et la publicité en ligne.",
-    tools: ["Blender", "Octane Render", "After Effects"],
-  },
-];
 
 const DISCIPLINES = [
   "3D Modeling",
