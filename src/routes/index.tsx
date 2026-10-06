@@ -146,7 +146,7 @@ function Hero() {
           className="hero-rise text-[12px] font-normal tracking-[0.35em] uppercase text-primary"
           style={{ animationDelay: "100ms" }}
         >
-          3D Studio — Publicité · Motion · Animation
+          3D Studio — Advertising · Motion · Animation
         </p>
         <h1
           className="hero-rise mt-6 font-display text-[clamp(4.5rem,12vw,8rem)] leading-[0.95] font-medium tracking-tight text-foreground"
@@ -168,7 +168,7 @@ function Hero() {
             href="#work"
             className="group inline-flex items-center gap-3 rounded-full bg-foreground px-7 py-3 text-sm font-medium tracking-wide text-background transition-all hover:bg-primary hover:text-primary-foreground"
           >
-            Voir le portfolio
+            View the work
             <ArrowDown className="size-4 transition-transform group-hover:translate-y-0.5" />
           </a>
         </div>
@@ -204,12 +204,14 @@ function ProjectModal({
     };
   }, [onClose]);
 
+  const video = project.video;
+
   return (
     <div
       className="fixed inset-0 z-[70] flex items-center justify-center p-4 sm:p-8"
       role="dialog"
       aria-modal="true"
-      aria-label={`Projet ${project.title}`}
+      aria-label={`Project ${project.title}`}
     >
       <div
         className="absolute inset-0 animate-in fade-in duration-300 bg-background/85 backdrop-blur-sm"
@@ -218,36 +220,79 @@ function ProjectModal({
       <div className="animate-in fade-in zoom-in-95 duration-300 shadow-soft relative max-h-full w-full max-w-3xl overflow-y-auto rounded-lg border border-border/60 bg-surface">
         <button
           onClick={onClose}
-          aria-label="Fermer"
+          aria-label="Close"
           className="absolute right-4 top-4 z-10 flex size-9 items-center justify-center rounded-full border border-border bg-background/70 text-foreground backdrop-blur-sm transition-colors duration-300 hover:border-primary/50 hover:text-primary"
         >
           <X className="size-4" />
         </button>
 
         <div className="relative aspect-video overflow-hidden">
-          <img
-            src={project.image}
-            alt={`${project.title} — ${project.category}`}
-            width={1280}
-            height={720}
-            className="h-full w-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-surface via-transparent to-transparent" />
+          {video && video.stable ? (
+            <iframe
+              src={video.embedUrl}
+              title={`${project.title} — video`}
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+              className="h-full w-full"
+            />
+          ) : (
+            <>
+              <img
+                src={video ? video.poster : project.cover}
+                alt={`${project.title} — ${project.category}`}
+                className="h-full w-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-surface via-transparent to-transparent" />
+              {video && (
+                <a
+                  href={project.artstationUrl}
+                  {...EXT}
+                  className="absolute inset-0 flex items-center justify-center"
+                >
+                  <span className="flex items-center gap-2 rounded-full border border-border/60 bg-background/70 px-4 py-2 text-[11px] tracking-[0.16em] uppercase text-foreground transition-colors duration-300 hover:text-primary">
+                    <Play className="size-3.5" />
+                    Watch the animation on ArtStation
+                  </span>
+                </a>
+              )}
+            </>
+          )}
         </div>
 
         <div className="px-6 pb-8 pt-4 sm:px-8">
           <p className="text-[11px] tracking-[0.3em] uppercase text-primary">
-            {project.category} · {project.year}
+            {project.category} · {project.year} · {project.projectType}
           </p>
           <h3 className="mt-3 font-display text-2xl font-medium tracking-tight text-foreground sm:text-3xl">
             {project.title}
           </h3>
-          <p className="mt-4 max-w-2xl text-sm font-light leading-relaxed text-muted-foreground sm:text-base">
-            {project.context}
+          {project.client && <ClientLine client={project.client} />}
+
+          {project.images.length > 0 && (
+            <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
+              {project.images.map((src, i) => (
+                <img
+                  key={src}
+                  src={src}
+                  alt={`${project.title} — image ${i + 1}`}
+                  loading="lazy"
+                  className="w-full rounded-md border border-border/60 object-cover"
+                />
+              ))}
+            </div>
+          )}
+
+          <p className="mt-6 max-w-2xl text-sm font-light leading-relaxed text-muted-foreground sm:text-base">
+            {project.description}
           </p>
+          {project.role && (
+            <p className="mt-4 text-sm font-light text-foreground/85">
+              Role: {project.role}
+            </p>
+          )}
 
           <div className="mt-6 flex flex-wrap gap-2">
-            {project.tools.map((tool) => (
+            {project.software.map((tool) => (
               <span
                 key={tool}
                 className="rounded-full border border-border bg-background px-3.5 py-1.5 text-[12px] font-light text-muted-foreground"
@@ -258,11 +303,11 @@ function ProjectModal({
           </div>
 
           <a
-            href="#contact"
-            onClick={onClose}
+            href={project.artstationUrl}
+            {...EXT}
             className="group mt-8 inline-flex items-center gap-2.5 rounded-full bg-foreground px-6 py-2.5 text-sm font-medium tracking-wide text-background transition-all duration-300 hover:bg-primary hover:text-primary-foreground"
           >
-            Discuter d&apos;un projet similaire
+            View on ArtStation
             <ArrowUpRight className="size-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
           </a>
         </div>
@@ -272,13 +317,13 @@ function ProjectModal({
 }
 
 function Portfolio() {
-  const [activeCategory, setActiveCategory] = useState<Category>("Tous");
+  const [activeCategory, setActiveCategory] = useState<Filter>("All");
   const [selected, setSelected] = useState<Project | null>(null);
 
   const visible =
-    activeCategory === "Tous"
-      ? PROJECTS
-      : PROJECTS.filter((p) => p.category === activeCategory);
+    activeCategory === "All"
+      ? projects
+      : projects.filter((p) => p.category === activeCategory);
 
   return (
     <section id="work" className="w-full border-t border-border/60">
@@ -290,19 +335,19 @@ function Portfolio() {
                 Work
               </p>
               <h2 className="mt-4 font-display text-4xl font-medium tracking-tight text-foreground sm:text-5xl">
-                Projets sélectionnés
+                Selected projects
               </h2>
             </div>
             <p className="hidden max-w-xs text-sm font-light text-muted-foreground md:block">
-              Campagnes publicitaires, films produits et explorations motion —
-              du storyboard au rendu final.
+              Advertising, product films, automotive and cinematic work —
+              from concept to final render.
             </p>
           </div>
         </Reveal>
 
         <Reveal delay={120}>
-          <div className="mt-12 flex flex-wrap gap-2.5" role="group" aria-label="Filtres de projets">
-            {CATEGORIES.map((category) => {
+          <div className="mt-12 flex flex-wrap gap-2.5" role="group" aria-label="Project filters">
+            {FILTERS.map((category) => {
               const isActive = category === activeCategory;
               return (
                 <button
@@ -324,29 +369,38 @@ function Portfolio() {
 
         <div className="mt-12 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
           {visible.map((project, i) => (
-            <Reveal key={project.title} delay={(i % 3) * 100}>
-              <button
+            <Reveal key={project.id} delay={(i % 3) * 100}>
+              <div
+                role="button"
+                tabIndex={0}
                 onClick={() => setSelected(project)}
-                className="group block h-full w-full overflow-hidden rounded-lg border border-border/60 bg-surface text-left shadow-soft transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:bg-surface-raised"
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    setSelected(project);
+                  }
+                }}
+                className="group block h-full w-full cursor-pointer overflow-hidden rounded-lg border border-border/60 bg-surface text-left shadow-soft transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:bg-surface-raised"
               >
                 <div className="relative aspect-video overflow-hidden">
                   <img
-                    src={project.image}
+                    src={project.cover}
                     alt={`${project.title} — ${project.category}`}
-                    width={1280}
-                    height={720}
                     loading="lazy"
                     className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-background/70 via-transparent to-transparent opacity-80" />
+                  <span className="absolute left-3 top-3 rounded-full border border-border/60 bg-background/70 px-2.5 py-1 text-[10px] tracking-[0.14em] uppercase text-foreground/85 backdrop-blur-sm">
+                    {project.projectType}
+                  </span>
                   <span className="absolute inset-0 flex items-center justify-center bg-background/30 opacity-0 backdrop-blur-[2px] transition-opacity duration-300 group-hover:opacity-100">
                     <span className="flex items-center gap-2 rounded-full border border-border/60 bg-background/70 px-4 py-2 text-[11px] tracking-[0.16em] uppercase text-foreground">
-                      {project.isVideo ? (
+                      {project.video ? (
                         <Play className="size-3.5" />
                       ) : (
                         <ArrowUpRight className="size-3.5" />
                       )}
-                      {project.isVideo ? "Voir la vidéo" : "Voir le projet"}
+                      {project.video ? "Watch the video" : "View project"}
                     </span>
                   </span>
                 </div>
@@ -360,10 +414,21 @@ function Portfolio() {
                     </span>
                   </div>
                   <p className="mt-1.5 text-sm font-light leading-relaxed text-muted-foreground">
-                    {project.description}
+                    {project.excerpt}
                   </p>
+                  {project.client && <ClientLine client={project.client} />}
+                  <div className="mt-4 flex flex-wrap gap-1.5">
+                    {project.software.map((tool) => (
+                      <span
+                        key={tool}
+                        className="rounded-full border border-border bg-background px-2.5 py-1 text-[11px] font-light text-muted-foreground"
+                      >
+                        {tool}
+                      </span>
+                    ))}
+                  </div>
                 </div>
-              </button>
+              </div>
             </Reveal>
           ))}
         </div>
@@ -386,8 +451,8 @@ function About() {
         <Reveal className="justify-self-center lg:justify-self-start">
           <div className="relative">
             <img
-              src={portrait}
-              alt="Paul Comaïta"
+              src={profile.avatar}
+              alt={profile.fullName}
               width={300}
               height={360}
               loading="lazy"
@@ -402,19 +467,19 @@ function About() {
 
         <Reveal delay={120}>
           <p className="text-[12px] tracking-[0.35em] uppercase text-primary">
-            À propos
+            About
           </p>
           <h2 className="mt-4 font-display text-3xl font-medium tracking-tight text-foreground sm:text-4xl">
-            Qui suis-je ?
+            Who am I?
           </h2>
           <p className="mt-8 max-w-[620px] text-[17px] font-light leading-[1.8] text-foreground/75">
-            Je suis artiste 3D spécialisé en publicité et direction artistique.
-            Passionné par la création d&apos;images immersives et la narration
-            visuelle, j&apos;explore le potentiel de la 3D dans la publicité,
-            la motion graphics et l&apos;animation produit.
+            I&apos;m a 3D artist specialising in advertising and art direction.
+            Passionate about creating immersive images and visual storytelling,
+            I explore the potential of 3D in advertising, motion graphics and
+            product animation.
           </p>
           <p className="mt-6 text-[15px] font-light tracking-wide text-muted-foreground">
-            Master en 3D Animation &amp; Production — IIM
+            Master&apos;s in 3D Animation &amp; Production — IIM
           </p>
         </Reveal>
       </div>
@@ -515,10 +580,9 @@ function Expertise() {
 }
 
 const CONTACT_SOCIALS = [
-  { label: "ArtStation", href: "https://artstation.com" },
-  { label: "Instagram", href: "https://instagram.com" },
-  { label: "LinkedIn", href: "https://linkedin.com" },
-  { label: "Malt", href: "https://malt.fr" },
+  { label: "ArtStation", href: profile.artstationUrl },
+  { label: "LinkedIn", href: profile.linkedinUrl },
+  { label: "Website", href: profile.websiteUrl },
 ];
 
 function Contact() {
@@ -534,17 +598,17 @@ function Contact() {
             Contact
           </p>
           <h2 className="mt-6 font-display text-5xl font-medium tracking-tight text-foreground sm:text-6xl">
-            Parlons de ton projet
+            Get in touch
           </h2>
           <p className="mx-auto mt-6 max-w-md text-base font-light text-muted-foreground">
-            Publicité, motion design, animation produit — racontez-moi votre
-            idée, je m&apos;occupe de lui donner vie.
+            Advertising, motion design, product animation — tell me about your
+            idea and I&apos;ll bring it to life.
           </p>
           <a
             href="mailto:hello@paulcomaita.com"
             className="group mt-10 inline-flex items-center gap-3 rounded-full border border-foreground/80 bg-transparent px-8 py-3.5 text-sm font-medium tracking-wide text-foreground transition-all duration-300 hover:scale-[1.05] hover:border-foreground hover:bg-foreground hover:text-background"
           >
-            Me contacter
+            Contact me
             <ArrowUpRight className="size-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
           </a>
 
@@ -554,7 +618,7 @@ function Contact() {
                 <a
                   href={href}
                   target="_blank"
-                  rel="noreferrer"
+                  rel="noopener noreferrer"
                   className="group inline-flex items-center gap-1.5 text-[13px] tracking-[0.14em] uppercase text-muted-foreground transition-colors duration-300 hover:text-primary"
                 >
                   {label}
@@ -574,7 +638,7 @@ function Footer() {
     <footer className="w-full border-t border-border/60">
       <div className="mx-auto flex w-full max-w-7xl flex-col items-center justify-between gap-6 px-6 py-10 sm:flex-row lg:px-10">
         <p className="text-[13px] font-light text-muted-foreground">
-          © 2026 Paul Comaïta — Tous droits réservés
+          © 2026 Paul Comaïta — All rights reserved
         </p>
         <ul className="flex items-center gap-5">
           {CONTACT_SOCIALS.map(({ label, href }) => (
@@ -582,7 +646,7 @@ function Footer() {
               <a
                 href={href}
                 target="_blank"
-                rel="noreferrer"
+                rel="noopener noreferrer"
                 className="text-[12px] tracking-[0.14em] uppercase text-muted-foreground transition-colors duration-300 hover:text-primary"
               >
                 {label}
