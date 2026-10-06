@@ -82,14 +82,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       {
         name: "description",
         content:
-          "Publicité, motion graphics et animation produit — découvrez l'univers 3D de Paul Comaïta.",
+          "Advertising, motion graphics and product animation — explore the 3D work of Paul Comaïta.",
       },
       { name: "author", content: "Paul Comaïta" },
       { property: "og:title", content: "Paul Comaïta — 3D Artist & Art Director" },
       {
         property: "og:description",
         content:
-          "Publicité, motion graphics et animation produit — découvrez l'univers 3D de Paul Comaïta.",
+          "Advertising, motion graphics and product animation — explore the 3D work of Paul Comaïta.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

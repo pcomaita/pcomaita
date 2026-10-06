@@ -146,7 +146,7 @@ function Hero() {
           className="hero-rise text-[12px] font-normal tracking-[0.35em] uppercase text-primary"
           style={{ animationDelay: "100ms" }}
         >
-          3D Studio — Publicité · Motion · Animation
+          3D Studio — Advertising · Motion · Animation
         </p>
         <h1
           className="hero-rise mt-6 font-display text-[clamp(4.5rem,12vw,8rem)] leading-[0.95] font-medium tracking-tight text-foreground"
@@ -168,7 +168,7 @@ function Hero() {
             href="#work"
             className="group inline-flex items-center gap-3 rounded-full bg-foreground px-7 py-3 text-sm font-medium tracking-wide text-background transition-all hover:bg-primary hover:text-primary-foreground"
           >
-            Voir le portfolio
+            View the work
             <ArrowDown className="size-4 transition-transform group-hover:translate-y-0.5" />
           </a>
         </div>
@@ -451,8 +451,8 @@ function About() {
         <Reveal className="justify-self-center lg:justify-self-start">
           <div className="relative">
             <img
-              src={portrait}
-              alt="Paul Comaïta"
+              src={profile.avatar}
+              alt={profile.fullName}
               width={300}
               height={360}
               loading="lazy"
@@ -467,19 +467,19 @@ function About() {
 
         <Reveal delay={120}>
           <p className="text-[12px] tracking-[0.35em] uppercase text-primary">
-            À propos
+            About
           </p>
           <h2 className="mt-4 font-display text-3xl font-medium tracking-tight text-foreground sm:text-4xl">
-            Qui suis-je ?
+            Who am I?
           </h2>
           <p className="mt-8 max-w-[620px] text-[17px] font-light leading-[1.8] text-foreground/75">
-            Je suis artiste 3D spécialisé en publicité et direction artistique.
-            Passionné par la création d&apos;images immersives et la narration
-            visuelle, j&apos;explore le potentiel de la 3D dans la publicité,
-            la motion graphics et l&apos;animation produit.
+            I&apos;m a 3D artist specialising in advertising and art direction.
+            Passionate about creating immersive images and visual storytelling,
+            I explore the potential of 3D in advertising, motion graphics and
+            product animation.
           </p>
           <p className="mt-6 text-[15px] font-light tracking-wide text-muted-foreground">
-            Master en 3D Animation &amp; Production — IIM
+            Master&apos;s in 3D Animation &amp; Production — IIM
           </p>
         </Reveal>
       </div>
@@ -580,10 +580,9 @@ function Expertise() {
 }
 
 const CONTACT_SOCIALS = [
-  { label: "ArtStation", href: "https://artstation.com" },
-  { label: "Instagram", href: "https://instagram.com" },
-  { label: "LinkedIn", href: "https://linkedin.com" },
-  { label: "Malt", href: "https://malt.fr" },
+  { label: "ArtStation", href: profile.artstationUrl },
+  { label: "LinkedIn", href: profile.linkedinUrl },
+  { label: "Website", href: profile.websiteUrl },
 ];
 
 function Contact() {
@@ -599,17 +598,17 @@ function Contact() {
             Contact
           </p>
           <h2 className="mt-6 font-display text-5xl font-medium tracking-tight text-foreground sm:text-6xl">
-            Parlons de ton projet
+            Get in touch
           </h2>
           <p className="mx-auto mt-6 max-w-md text-base font-light text-muted-foreground">
-            Publicité, motion design, animation produit — racontez-moi votre
-            idée, je m&apos;occupe de lui donner vie.
+            Advertising, motion design, product animation — tell me about your
+            idea and I&apos;ll bring it to life.
           </p>
           <a
             href="mailto:hello@paulcomaita.com"
             className="group mt-10 inline-flex items-center gap-3 rounded-full border border-foreground/80 bg-transparent px-8 py-3.5 text-sm font-medium tracking-wide text-foreground transition-all duration-300 hover:scale-[1.05] hover:border-foreground hover:bg-foreground hover:text-background"
           >
-            Me contacter
+            Contact me
             <ArrowUpRight className="size-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
           </a>
 
@@ -619,7 +618,7 @@ function Contact() {
                 <a
                   href={href}
                   target="_blank"
-                  rel="noreferrer"
+                  rel="noopener noreferrer"
                   className="group inline-flex items-center gap-1.5 text-[13px] tracking-[0.14em] uppercase text-muted-foreground transition-colors duration-300 hover:text-primary"
                 >
                   {label}
@@ -639,7 +638,7 @@ function Footer() {
     <footer className="w-full border-t border-border/60">
       <div className="mx-auto flex w-full max-w-7xl flex-col items-center justify-between gap-6 px-6 py-10 sm:flex-row lg:px-10">
         <p className="text-[13px] font-light text-muted-foreground">
-          © 2026 Paul Comaïta — Tous droits réservés
+          © 2026 Paul Comaïta — All rights reserved
         </p>
         <ul className="flex items-center gap-5">
           {CONTACT_SOCIALS.map(({ label, href }) => (
@@ -647,7 +646,7 @@ function Footer() {
               <a
                 href={href}
                 target="_blank"
-                rel="noreferrer"
+                rel="noopener noreferrer"
                 className="text-[12px] tracking-[0.14em] uppercase text-muted-foreground transition-colors duration-300 hover:text-primary"
               >
                 {label}
