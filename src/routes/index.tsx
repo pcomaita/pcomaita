@@ -1,3 +1,4 @@
+// Projects are loaded from src/data/projects.ts
 import { useEffect, useRef, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import {
