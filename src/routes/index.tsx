@@ -10,6 +10,7 @@ import {
 import { HeroScene } from "@/components/HeroScene";
 import { Reveal } from "@/components/Reveal";
 import {
+  ATMOSPHERES,
   categories,
   profile,
   projects,
@@ -147,7 +148,7 @@ function Hero() {
           className="hero-rise text-[12px] font-normal tracking-[0.35em] uppercase text-primary"
           style={{ animationDelay: "100ms" }}
         >
-          3D Studio — Advertising · Motion · Animation
+          3D Artist — Advertising · Motion · Product
         </p>
         <h1
           className="hero-rise mt-6 font-display text-[clamp(4.5rem,12vw,8rem)] leading-[0.95] font-medium tracking-tight text-foreground"
@@ -471,7 +472,7 @@ function About() {
             About
           </p>
           <h2 className="mt-4 font-display text-3xl font-medium tracking-tight text-foreground sm:text-4xl">
-            Who am I?
+            About
           </h2>
           <p className="mt-8 max-w-[620px] text-[17px] font-light leading-[1.8] text-foreground/75">
             I&apos;m a 3D artist specialising in advertising and art direction.
@@ -481,6 +482,29 @@ function About() {
           </p>
           <p className="mt-6 text-[15px] font-light tracking-wide text-muted-foreground">
             Master&apos;s in 3D Animation &amp; Production — IIM
+          </p>
+          <p className="mt-4 text-[15px] font-light tracking-wide text-muted-foreground">
+            Based in Paris — available for full-time, contract and freelance
+            work.
+          </p>
+          <p className="mt-3 text-[15px] font-light tracking-wide text-muted-foreground">
+            I&apos;ve worked with the agency{" "}
+            <a
+              href={ATMOSPHERES.url}
+              {...EXT}
+              className="underline-offset-4 transition-colors duration-300 hover:text-primary hover:underline"
+            >
+              Atmosphères
+            </a>{" "}
+            on 3D content for the{" "}
+            <a
+              href={ATMOSPHERES.contextUrl}
+              {...EXT}
+              className="underline-offset-4 transition-colors duration-300 hover:text-primary hover:underline"
+            >
+              Microsoft ExpertZone France
+            </a>{" "}
+            channel.
           </p>
         </Reveal>
       </div>
@@ -583,7 +607,6 @@ function Expertise() {
 const CONTACT_SOCIALS = [
   { label: "ArtStation", href: profile.artstationUrl },
   { label: "LinkedIn", href: profile.linkedinUrl },
-  { label: "Website", href: profile.websiteUrl },
 ];
 
 function Contact() {
@@ -606,7 +629,7 @@ function Contact() {
             idea and I&apos;ll bring it to life.
           </p>
           <a
-            href="mailto:hello@paulcomaita.com"
+            href="mailto:email@paulcomaita.art"
             className="group mt-10 inline-flex items-center gap-3 rounded-full border border-foreground/80 bg-transparent px-8 py-3.5 text-sm font-medium tracking-wide text-foreground transition-all duration-300 hover:scale-[1.05] hover:border-foreground hover:bg-foreground hover:text-background"
           >
             Contact me

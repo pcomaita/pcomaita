@@ -65,7 +65,7 @@ export interface ProjectClient {
 }
 
 /** Commissioning agency behind the Microsoft ExpertZone France content. */
-const ATMOSPHERES: ProjectClient = {
+export const ATMOSPHERES: ProjectClient = {
   name: "Atmosphères",
   url: "https://atmospheres.tm.fr/",
   context: "3D content for the Microsoft ExpertZone France channel",
