@@ -5,6 +5,7 @@ import { ArrowDown } from "lucide-react";
 import { Reveal } from "@/components/Reveal";
 import { ATMOSPHERES, featuredProjects, profile } from "@/data/projects";
 import { Contact, EXT, Footer, ProjectGrid, SiteNav } from "@/components/site";
+import { Expertise } from "@/components/expertise";
 
 const DESCRIPTION =
   "Advertising, motion graphics and product animation — explore the 3D work of Paul Comaïta.";
@@ -24,26 +25,8 @@ export const Route = createFileRoute("/")({
   component: Index,
 });
 
-const DISCIPLINES = [
-  "3D Modeling",
-  "Texturing",
-  "Lighting",
-  "Compositing",
-  "Motion Graphics",
-  "Art Direction",
-  "Product Animation",
-];
-
-const TOOLS = [
-  { name: "Blender", level: 95 },
-  { name: "DaVinci Resolve", level: 90 },
-  { name: "Photoshop", level: 88 },
-  { name: "Nuke", level: 85 },
-];
-
 function Hero() {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [playing, setPlaying] = useState(false);
   const [videoSrc, setVideoSrc] = useState<string | null>(null);
 
   useEffect(() => {
@@ -63,9 +46,9 @@ function Hero() {
   return (
     <section
       id="home"
-      className="grain relative flex min-h-screen w-full items-center justify-center overflow-hidden"
+      className="theme-dark grain relative flex min-h-screen w-full items-center justify-center overflow-hidden bg-background"
     >
-      {/* Poster shown immediately, same cover/center behavior */}
+      {/* Poster = first frame of the video, so the switch to the video is invisible */}
       <img
         src="/hero-poster.jpg"
         alt=""
@@ -84,18 +67,21 @@ function Hero() {
           preload="auto"
           disablePictureInPicture
           aria-hidden="true"
-          onPlaying={() => setPlaying(true)}
-          className="absolute inset-0 h-full w-full object-cover object-center transition-opacity duration-[600ms]"
-          style={{ opacity: playing ? 1 : 0 }}
+          className="absolute inset-0 h-full w-full object-cover object-center"
         />
       )}
-      {/* Readability overlay + bottom fade into page background */}
+      {/* Readability overlay */}
       <div
         className="pointer-events-none absolute inset-0"
         style={{
           background:
-            "radial-gradient(ellipse 60% 55% at 50% 50%, rgba(10,10,10,0.68) 0%, rgba(10,10,10,0.40) 60%, rgba(10,10,10,0.25) 100%), linear-gradient(to bottom, transparent 70%, oklch(14.5% 0 0) 100%)",
+            "radial-gradient(ellipse 60% 55% at 50% 50%, rgba(10,10,10,0.68) 0%, rgba(10,10,10,0.40) 60%, rgba(10,10,10,0.25) 100%)",
         }}
+      />
+      {/* Bottom fade into the dark page (hidden in light mode, see styles.css) */}
+      <div
+        className="hero-fade pointer-events-none absolute inset-0"
+        style={{ background: "linear-gradient(to bottom, transparent 70%, oklch(14.5% 0 0) 100%)" }}
       />
 
       <div className="pointer-events-none relative z-10 flex w-full max-w-5xl flex-col items-center px-6 text-center">
@@ -250,99 +236,10 @@ function About() {
   );
 }
 
-function SkillBar({ name, level }: { name: string; level: number }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const [visible, setVisible] = useState(false);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const entry = entries[0];
-        if (entry?.isIntersecting) {
-          setVisible(true);
-          observer.disconnect();
-        }
-      },
-      { threshold: 0.4 },
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, []);
-
-  return (
-    <div ref={ref}>
-      <div className="flex items-baseline justify-between">
-        <span className="text-[15px] font-light text-foreground/90">
-          {name}
-        </span>
-        <span className="text-[13px] font-light tracking-wide text-muted-foreground">
-          {level}%
-        </span>
-      </div>
-      <div className="mt-3 h-1 w-full overflow-hidden rounded-full bg-border/50">
-        <div
-          className="h-full rounded-full bg-primary transition-[width] duration-1000 ease-out"
-          style={{ width: visible ? `${level}%` : "0%" }}
-        />
-      </div>
-    </div>
-  );
-}
-
-function Expertise() {
-  return (
-    <div className="border-t border-border/40 bg-primary/[0.04]">
-      <div className="mx-auto w-full max-w-7xl px-6 py-20 lg:px-10 lg:py-24">
-        <Reveal>
-          <p className="text-[12px] tracking-[0.35em] uppercase text-primary">
-            Expertise
-          </p>
-        </Reveal>
-
-        <div className="mt-12 grid grid-cols-1 gap-14 lg:grid-cols-2 lg:gap-24">
-          <Reveal delay={120}>
-            <h3 className="text-[11px] tracking-[0.3em] uppercase text-muted-foreground">
-              Disciplines
-            </h3>
-            <ul className="mt-7">
-              {DISCIPLINES.map((discipline) => (
-                <li
-                  key={discipline}
-                  className="group flex items-center gap-5 border-b border-border/50 py-4 text-[15px] font-light text-foreground/90 transition-colors duration-300 hover:text-primary"
-                >
-                  <span
-                    className="h-px w-5 shrink-0 bg-primary/60 transition-all duration-300 group-hover:w-8"
-                    aria-hidden="true"
-                  />
-                  {discipline}
-                </li>
-              ))}
-            </ul>
-          </Reveal>
-
-          <Reveal delay={240}>
-            <h3 className="text-[11px] tracking-[0.3em] uppercase text-muted-foreground">
-              Tools &amp; Software
-            </h3>
-            <ul className="mt-7 space-y-8">
-              {TOOLS.map((tool) => (
-                <li key={tool.name}>
-                  <SkillBar name={tool.name} level={tool.level} />
-                </li>
-              ))}
-            </ul>
-          </Reveal>
-        </div>
-      </div>
-    </div>
-  );
-}
 function Index() {
   return (
     <div className="min-h-screen w-full bg-background text-foreground">
-      <SiteNav />
+      <SiteNav overHero />
       <main>
         <Hero />
         <Portfolio />

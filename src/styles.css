@@ -46,7 +46,14 @@
 
 :root {
   --radius: 0.375rem;
+}
 
+/*
+ * Dark theme = default. `.theme-dark` re-applies the dark tokens to a subtree
+ * (hero, navbar over the hero) so it stays dark when the site is in light mode.
+ */
+:root,
+.theme-dark {
   /* Deep studio blacks */
   --background: oklch(0.145 0 0);          /* #0a0a0a */
   --foreground: oklch(0.97 0.002 240);     /* near white */
@@ -75,6 +82,58 @@
   --border: oklch(1 0 0 / 9%);
   --input: oklch(1 0 0 / 12%);
   --ring: oklch(0.79 0.125 205);
+}
+
+/* Inherited text color must follow the scoped tokens too. */
+.theme-dark {
+  color: var(--foreground);
+}
+
+/* Light theme — toggled by the lamp button (class on <html>). */
+html.light {
+  --background: oklch(0.985 0.002 240);
+  --foreground: oklch(0.16 0.005 240);
+  --surface: oklch(0.96 0.003 240);
+  --surface-raised: oklch(1 0 0);
+
+  --card: oklch(0.96 0.003 240);
+  --card-foreground: oklch(0.16 0.005 240);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.16 0.005 240);
+
+  /* Darker cyan so text keeps WCAG AA contrast on a light background */
+  --primary: oklch(0.5 0.1 210);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.93 0.005 240);
+  --secondary-foreground: oklch(0.16 0.005 240);
+
+  --muted: oklch(0.94 0.004 240);
+  --muted-foreground: oklch(0.45 0.01 240);
+  --accent: oklch(0.5 0.1 210);
+  --accent-foreground: oklch(0.985 0 0);
+
+  --border: oklch(0 0 0 / 9%);
+  --input: oklch(0 0 0 / 12%);
+  --ring: oklch(0.5 0.1 210);
+}
+
+/* The hero's bottom fade into the page only makes sense on the dark page. */
+html.light .hero-fade {
+  display: none;
+}
+
+/* Smooth color change while switching themes (class added for ~400ms). */
+html.theme-switching,
+html.theme-switching * {
+  transition:
+    background-color 300ms ease,
+    color 300ms ease,
+    border-color 300ms ease,
+    fill 300ms ease !important;
+}
+
+html.light .shadow-soft {
+  box-shadow: 0 20px 50px -24px oklch(0 0 0 / 0.18);
 }
 
 @layer base {
@@ -175,4 +234,9 @@
   pointer-events: none;
   opacity: 0.035;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* In the hero the grain sits above the video and overlay, below the text. */
+#home.grain::before {
+  z-index: 1;
 }

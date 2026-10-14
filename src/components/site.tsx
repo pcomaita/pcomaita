@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { ArrowUpRight, Play, X } from "lucide-react";
+import { ArrowUpRight, Lightbulb, LightbulbOff, Play, X } from "lucide-react";
 import { Reveal } from "@/components/Reveal";
 import {
   categories,
@@ -22,9 +22,85 @@ const FILTERS: Filter[] = ["All", ...categories];
 
 export const EXT = { target: "_blank", rel: "noopener noreferrer" } as const;
 
-export function SiteNav() {
+const THEME_KEY = "theme";
+
+/** Lamp toggle: lights off = dark theme (default), lights on = light theme. */
+export function ThemeToggle() {
+  const [light, setLight] = useState(false);
+
+  useEffect(() => {
+    setLight(document.documentElement.classList.contains("light"));
+  }, []);
+
+  const toggle = () => {
+    const next = !light;
+    const root = document.documentElement;
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (!reduced) {
+      root.classList.add("theme-switching");
+      window.setTimeout(() => root.classList.remove("theme-switching"), 400);
+    }
+    root.classList.toggle("light", next);
+    try {
+      localStorage.setItem(THEME_KEY, next ? "light" : "dark");
+    } catch {
+      /* storage unavailable: the choice simply isn't remembered */
+    }
+    setLight(next);
+  };
+
+  const label = light ? "Lights off" : "Lights on";
+
   return (
-    <header className="fixed inset-x-0 top-0 z-50 border-b border-border/60 bg-background/70 backdrop-blur-md">
+    <button
+      type="button"
+      onClick={toggle}
+      aria-label={label}
+      title={label}
+      className="relative flex size-9 items-center justify-center rounded-full border border-primary/40 text-muted-foreground transition-colors hover:border-primary hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+    >
+      <LightbulbOff
+        aria-hidden="true"
+        className={`absolute size-4 transition-all duration-200 ${
+          light ? "rotate-45 scale-75 opacity-0" : "rotate-0 scale-100 opacity-100"
+        }`}
+      />
+      <Lightbulb
+        aria-hidden="true"
+        className={`absolute size-4 text-primary transition-all duration-200 ${
+          light ? "rotate-0 scale-100 opacity-100" : "-rotate-45 scale-75 opacity-0"
+        }`}
+        style={{ filter: light ? "drop-shadow(0 0 6px var(--primary))" : undefined }}
+      />
+    </button>
+  );
+}
+
+/**
+ * `overHero`: on the homepage the navbar stays dark while it sits over the
+ * (always dark) hero video, then follows the current theme once scrolled past it.
+ */
+export function SiteNav({ overHero = false }: { overHero?: boolean }) {
+  const [onHero, setOnHero] = useState(overHero);
+
+  useEffect(() => {
+    if (!overHero) return;
+    const update = () => setOnHero(window.scrollY < window.innerHeight - 64);
+    update();
+    window.addEventListener("scroll", update, { passive: true });
+    window.addEventListener("resize", update);
+    return () => {
+      window.removeEventListener("scroll", update);
+      window.removeEventListener("resize", update);
+    };
+  }, [overHero]);
+
+  return (
+    <header
+      className={`fixed inset-x-0 top-0 z-50 border-b border-border/60 bg-background/70 backdrop-blur-md ${
+        onHero ? "theme-dark" : ""
+      }`}
+    >
       <nav className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between px-6 lg:px-10">
         <a
           href="/"
@@ -32,7 +108,7 @@ export function SiteNav() {
         >
           Paul Comaïta<span className="text-primary">.</span>
         </a>
-        <ul className="flex items-center gap-8">
+        <ul className="flex items-center gap-3 sm:gap-8">
           {NAV_LINKS.map((link) => (
             <li key={link.href} className="hidden sm:block">
               {link.href === "/work" ? (
@@ -52,6 +128,9 @@ export function SiteNav() {
               )}
             </li>
           ))}
+          <li>
+            <ThemeToggle />
+          </li>
           <li>
             <a
               href="/#contact"
@@ -98,7 +177,7 @@ function ClientLine({ client }: { client: ProjectClient }) {
   );
 }
 
-function ProjectModal({
+export function ProjectModal({
   project,
   onClose,
 }: {
@@ -375,7 +454,7 @@ export function Contact() {
             idea and I&apos;ll bring it to life.
           </p>
           <a
-            href="mailto:email@paulcomaita.art"
+            href="mailto:contact@paulcomaita.art"
             className="group mt-10 inline-flex items-center gap-3 rounded-full border border-foreground/80 bg-transparent px-8 py-3.5 text-sm font-medium tracking-wide text-foreground transition-all duration-300 hover:scale-[1.05] hover:border-foreground hover:bg-foreground hover:text-background"
           >
             Contact me
