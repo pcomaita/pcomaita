@@ -7,7 +7,6 @@ import {
   Play,
   X,
 } from "lucide-react";
-import { HeroScene } from "@/components/HeroScene";
 import { Reveal } from "@/components/Reveal";
 import {
   ATMOSPHERES,
@@ -134,19 +133,66 @@ function SiteNav() {
 }
 
 function Hero() {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [playing, setPlaying] = useState(false);
+  const [videoSrc, setVideoSrc] = useState<string | null>(null);
+
+  useEffect(() => {
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const saveData =
+      "connection" in navigator &&
+      Boolean((navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData);
+    if (reduced || saveData) return;
+    const mobile = window.matchMedia("(max-width: 767px)").matches;
+    setVideoSrc(mobile ? "/hero-mobile.mp4" : "/hero-desktop.mp4");
+  }, []);
+
+  useEffect(() => {
+    if (videoRef.current) videoRef.current.muted = true;
+  }, [videoSrc]);
+
   return (
     <section
       id="home"
       className="grain relative flex min-h-screen w-full items-center justify-center overflow-hidden"
     >
-      <HeroScene />
-      {/* Soft vignette so type stays legible over the 3D element */}
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,var(--color-background)_78%)]" />
+      {/* Poster shown immediately, same cover/center behavior */}
+      <img
+        src="/hero-poster.jpg"
+        alt=""
+        aria-hidden="true"
+        className="absolute inset-0 h-full w-full object-cover object-center"
+      />
+      {videoSrc && (
+        <video
+          ref={videoRef}
+          src={videoSrc}
+          poster="/hero-poster.jpg"
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="auto"
+          disablePictureInPicture
+          aria-hidden="true"
+          onPlaying={() => setPlaying(true)}
+          className="absolute inset-0 h-full w-full object-cover object-center transition-opacity duration-[600ms]"
+          style={{ opacity: playing ? 1 : 0 }}
+        />
+      )}
+      {/* Readability overlay + bottom fade into page background */}
+      <div
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background:
+            "radial-gradient(ellipse 60% 55% at 50% 50%, rgba(10,10,10,0.68) 0%, rgba(10,10,10,0.40) 60%, rgba(10,10,10,0.25) 100%), linear-gradient(to bottom, transparent 70%, oklch(14.5% 0 0) 100%)",
+        }}
+      />
 
       <div className="pointer-events-none relative z-10 flex w-full max-w-5xl flex-col items-center px-6 text-center">
         <p
           className="hero-rise text-[12px] font-normal tracking-[0.35em] uppercase text-primary"
-          style={{ animationDelay: "100ms" }}
+          style={{ animationDelay: "100ms", textShadow: "0 2px 12px rgba(0,0,0,0.6)" }}
         >
           3D Artist — Advertising · Motion · Product
         </p>
@@ -158,7 +204,7 @@ function Hero() {
         </h1>
         <p
           className="hero-rise mt-6 max-w-xl text-base font-light tracking-wide text-muted-foreground sm:text-lg"
-          style={{ animationDelay: "360ms" }}
+          style={{ animationDelay: "360ms", textShadow: "0 2px 12px rgba(0,0,0,0.6)" }}
         >
           3D Artist &amp; Art Director — Blender, Motion &amp; Cinematic
         </p>
