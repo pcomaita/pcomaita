@@ -4,6 +4,8 @@
 // Descriptions are Paul's own ArtStation copy, lightly edited for grammar.
 // No context has been added that is not present in the source posts.
 
+import portraitPaul from "@/assets/portrait-paul.jpg";
+
 export type ProjectCategory =
   | "Advertising & Product"
   | "Automotive"
@@ -86,8 +88,7 @@ export const profile = {
   artstationUrl: "https://www.artstation.com/paul_comaita",
   linkedinUrl: "https://www.linkedin.com/in/paul-comaita",
   websiteUrl: "https://paulc.framer.website/",
-  avatar:
-    "https://cdna.artstation.com/p/users/avatars/001/642/696/large/f9317c2b89e146e1cbeaa8fbf1334907.jpg?1718643290",
+  avatar: portraitPaul,
 } as const;
 
 export const categories: ProjectCategory[] = [
