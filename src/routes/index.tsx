@@ -1,11 +1,12 @@
 // Projects are loaded from src/data/projects.ts
 import { useEffect, useRef, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowDown } from "lucide-react";
+import { ArrowDown, ArrowUpRight } from "lucide-react";
 import { Reveal } from "@/components/Reveal";
 import { ATMOSPHERES, featuredProjects, profile } from "@/data/projects";
 import { Contact, EXT, Footer, ProjectGrid, SiteNav } from "@/components/site";
 import { Expertise } from "@/components/expertise";
+import { experiences } from "@/data/experience";
 
 const DESCRIPTION =
   "Advertising, motion graphics and product animation — explore the 3D work of Paul Comaïta.";
@@ -165,13 +166,66 @@ function Portfolio() {
   );
 }
 
+function ExperienceList() {
+  return (
+    <div>
+      <p className="text-[12px] tracking-[0.35em] uppercase text-primary">Career</p>
+      <h2 className="mt-4 font-display text-3xl font-medium tracking-tight text-foreground sm:text-4xl">
+        Experience
+      </h2>
+      <ol className="relative mt-8 border-l border-border pl-6">
+        {experiences.map((xp, i) => (
+          <li key={`${xp.company}-${xp.period}`} className={i > 0 ? "mt-7" : ""}>
+            <span
+              aria-hidden="true"
+              className={`absolute -left-[4.5px] mt-[7px] size-2 rounded-full ${
+                i === 0 ? "bg-primary" : "border border-border bg-background"
+              }`}
+            />
+            <p className="text-[11px] tracking-[0.2em] uppercase text-muted-foreground">
+              {xp.period}
+            </p>
+            <h3 className="mt-1.5 text-[16px] font-normal text-foreground">
+              {xp.role}
+              <span className="text-muted-foreground"> · </span>
+              {xp.companyUrl ? (
+                <a
+                  href={xp.companyUrl}
+                  {...EXT}
+                  className="underline-offset-4 transition-colors duration-300 hover:text-primary hover:underline"
+                >
+                  {xp.company}
+                </a>
+              ) : (
+                xp.company
+              )}
+            </h3>
+            <p className="mt-0.5 text-[13px] font-light text-muted-foreground">{xp.meta}</p>
+            <p className="mt-2 text-[14px] font-light leading-relaxed text-foreground/70">
+              {xp.summary}
+            </p>
+          </li>
+        ))}
+      </ol>
+      <a
+        href={profile.linkedinUrl}
+        {...EXT}
+        className="group mt-8 inline-flex items-center gap-1.5 text-[12px] tracking-[0.14em] uppercase text-muted-foreground transition-colors duration-300 hover:text-primary"
+      >
+        Full profile on LinkedIn
+        <ArrowUpRight className="size-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+      </a>
+    </div>
+  );
+}
+
 function About() {
   return (
     <section
       id="about"
       className="w-full border-t border-border/60 bg-surface/40"
     >
-      <div className="mx-auto grid w-full max-w-5xl grid-cols-1 items-center gap-12 px-6 py-28 sm:gap-16 lg:grid-cols-[300px_1fr] lg:gap-24 lg:py-36">
+      <div className="mx-auto grid w-full max-w-7xl grid-cols-1 items-start gap-12 px-6 py-28 sm:gap-16 lg:grid-cols-[260px_minmax(0,1fr)_minmax(0,1fr)] lg:gap-14 lg:px-10 lg:py-36 xl:gap-20">
         <Reveal className="justify-self-center lg:justify-self-start">
           <div className="relative">
             <img
@@ -180,7 +234,7 @@ function About() {
               width={300}
               height={360}
               loading="lazy"
-              className="aspect-[5/6] w-[260px] rounded-2xl object-cover grayscale-[35%] ring-1 ring-primary/50 sm:w-[300px]"
+              className="aspect-[5/6] w-[260px] rounded-2xl object-cover grayscale-[35%] ring-1 ring-primary/50 sm:w-[300px] lg:w-[260px]"
             />
             <span
               className="absolute -inset-3 -z-10 rounded-3xl bg-primary/10 blur-2xl"
@@ -228,6 +282,10 @@ function About() {
             </a>{" "}
             channel.
           </p>
+        </Reveal>
+
+        <Reveal delay={240}>
+          <ExperienceList />
         </Reveal>
       </div>
 
