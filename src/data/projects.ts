@@ -53,6 +53,8 @@ export interface Project {
   role?: string;
   artstationUrl: string;
   featured: boolean;
+  /** Display order among featured projects on the homepage (lower first). */
+  order: number;
 }
 
 export interface ProjectClient {
@@ -97,6 +99,35 @@ export const categories: ProjectCategory[] = [
 
 export const projects: Project[] = [
   {
+    id: "QxXRaE",
+    slug: "the-enchained-crown",
+    title: "The Enchained Crown",
+    year: 2026,
+    category: "Film & VFX",
+    projectType: "Personal project",
+    excerpt: "A short 3D cinematic loop: a crown held up by chains.",
+    description:
+      "A short 3D cinematic loop: a crown held up by chains, light beams cutting through fog, embers floating in the air. It represents ambition under pressure. The crown is the goal; the chains are the effort and sacrifices that never show in the final result; the fire is the drive that pushes forward, but can also burn out. A personal project: no client, no brief.",
+    cover:
+      "https://cdna.artstation.com/p/assets/images/images/102/256/152/large/paul-comaita-01.webp?1788885737",
+    images: [
+      "https://cdna.artstation.com/p/assets/images/images/102/256/152/large/paul-comaita-01.webp?1788885737",
+      "https://cdna.artstation.com/p/assets/images/images/102/256/164/large/paul-comaita-02.webp?1788885750",
+      "https://cdna.artstation.com/p/assets/images/images/102/256/184/large/paul-comaita-03.webp?1788946430",
+    ],
+    video: {
+      provider: "youtube",
+      embedUrl: "https://www.youtube-nocookie.com/embed/WHGZ65Y2D3c?rel=0",
+      poster:
+        "https://cdna.artstation.com/p/assets/images/images/102/256/152/large/paul-comaita-01.webp?1788885737",
+      stable: true,
+    },
+    software: ["Blender", "Photoshop", "DaVinci Resolve"],
+    artstationUrl: "https://www.artstation.com/artwork/QxXRaE",
+    featured: true,
+    order: 1,
+  },
+  {
     id: "mAJAa1",
     slug: "galaxy-book-presentation",
     title: "GalaxyBook",
@@ -127,6 +158,7 @@ export const projects: Project[] = [
     software: ["Blender", "Photoshop"],
     artstationUrl: "https://www.artstation.com/artwork/mAJAa1",
     featured: true,
+    order: 2,
   },
   {
     id: "04AzG5",
@@ -150,6 +182,7 @@ export const projects: Project[] = [
     software: ["Blender", "DaVinci Resolve"],
     artstationUrl: "https://www.artstation.com/artwork/04AzG5",
     featured: true,
+    order: 3,
   },
   {
     id: "w040dZ",
@@ -181,7 +214,8 @@ export const projects: Project[] = [
     software: ["Blender", "Photoshop", "Premiere"],
     role: "Director & 3D Supervisor",
     artstationUrl: "https://www.artstation.com/artwork/w040dZ",
-    featured: true,
+    featured: false,
+    order: 5,
   },
   {
     id: "2BZnrJ",
@@ -209,7 +243,8 @@ export const projects: Project[] = [
     },
     software: ["Blender", "DaVinci Resolve"],
     artstationUrl: "https://www.artstation.com/artwork/2BZnrJ",
-    featured: false,
+    featured: true,
+    order: 4,
   },
   {
     id: "rJoYze",
@@ -229,6 +264,7 @@ export const projects: Project[] = [
     software: ["Blender", "Photoshop"],
     artstationUrl: "https://www.artstation.com/artwork/rJoYze",
     featured: false,
+    order: 6,
   },
   {
     id: "vbwwXd",
@@ -256,6 +292,7 @@ export const projects: Project[] = [
     software: ["Unreal Engine", "Nuke"],
     artstationUrl: "https://www.artstation.com/artwork/vbwwXd",
     featured: false,
+    order: 7,
   },
   {
     id: "6LAez0",
@@ -286,6 +323,7 @@ export const projects: Project[] = [
     software: ["Blender", "Photoshop"],
     artstationUrl: "https://www.artstation.com/artwork/6LAez0",
     featured: false,
+    order: 8,
   },
   {
     id: "YGNgdP",
@@ -315,7 +353,18 @@ export const projects: Project[] = [
     software: ["Blender", "Photoshop"],
     artstationUrl: "https://www.artstation.com/artwork/YGNgdP",
     featured: false,
+    order: 9,
   },
 ];
+
+/** Homepage selection, in display order. */
+export const featuredProjects = projects
+  .filter((p) => p.featured)
+  .sort((a, b) => a.order - b.order);
+
+/** All projects, newest first. */
+export const allProjectsByDate = [...projects].sort(
+  (a, b) => b.year - a.year || a.order - b.order,
+);
 
 export default projects;
