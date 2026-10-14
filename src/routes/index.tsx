@@ -173,40 +173,62 @@ function ExperienceList() {
       <h2 className="mt-4 font-display text-3xl font-medium tracking-tight text-foreground sm:text-4xl">
         Experience
       </h2>
-      <ol className="relative mt-8 border-l border-border pl-6">
-        {experiences.map((xp, i) => (
-          <li key={`${xp.company}-${xp.period}`} className={i > 0 ? "mt-7" : ""}>
-            <span
-              aria-hidden="true"
-              className={`absolute -left-[4.5px] mt-[7px] size-2 rounded-full ${
-                i === 0 ? "bg-primary" : "border border-border bg-background"
-              }`}
-            />
-            <p className="text-[11px] tracking-[0.2em] uppercase text-muted-foreground">
-              {xp.period}
-            </p>
-            <h3 className="mt-1.5 text-[16px] font-normal text-foreground">
-              {xp.role}
-              <span className="text-muted-foreground"> · </span>
-              {xp.companyUrl ? (
-                <a
-                  href={xp.companyUrl}
-                  {...EXT}
-                  className="underline-offset-4 transition-colors duration-300 hover:text-primary hover:underline"
+      {/*
+        Desktop: fixed-height scroll area. Each date is sticky inside its own
+        row, so the next row's date pushes it up while scrolling.
+        Mobile: the page scrolls; dates stick just under the fixed navbar.
+      */}
+      <div className="relative mt-8">
+        <div
+          tabIndex={0}
+          aria-label="Experience timeline (scrollable)"
+          className="exp-scroll rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring lg:max-h-[360px] lg:overflow-y-auto lg:overscroll-contain lg:pr-3 lg:[mask-image:linear-gradient(to_bottom,black_calc(100%-48px),transparent)]"
+        >
+          <ol className="lg:pb-12">
+            {experiences.map((xp, i) => (
+              <li
+                key={`${xp.company}-${xp.period}`}
+                className="grid grid-cols-[88px_minmax(0,1fr)] gap-x-5"
+              >
+                <p className="about-bg sticky top-16 z-10 self-start py-1 text-[11px] leading-[1.6] tracking-[0.16em] uppercase text-muted-foreground lg:top-0">
+                  {xp.period}
+                </p>
+                <div
+                  className={`relative border-l border-border pl-5 ${
+                    i < experiences.length - 1 ? "pb-8" : ""
+                  }`}
                 >
-                  {xp.company}
-                </a>
-              ) : (
-                xp.company
-              )}
-            </h3>
-            <p className="mt-0.5 text-[13px] font-light text-muted-foreground">{xp.meta}</p>
-            <p className="mt-2 text-[14px] font-light leading-relaxed text-foreground/70">
-              {xp.summary}
-            </p>
-          </li>
-        ))}
-      </ol>
+                  <span
+                    aria-hidden="true"
+                    className={`absolute -left-[4.5px] top-[9px] size-2 rounded-full ${
+                      i === 0 ? "bg-primary" : "border border-border bg-background"
+                    }`}
+                  />
+                  <h3 className="text-[16px] font-normal leading-snug text-foreground">
+                    {xp.role}
+                    <span className="text-muted-foreground"> · </span>
+                    {xp.companyUrl ? (
+                      <a
+                        href={xp.companyUrl}
+                        {...EXT}
+                        className="underline-offset-4 transition-colors duration-300 hover:text-primary hover:underline"
+                      >
+                        {xp.company}
+                      </a>
+                    ) : (
+                      xp.company
+                    )}
+                  </h3>
+                  <p className="mt-0.5 text-[13px] font-light text-muted-foreground">{xp.meta}</p>
+                  <p className="mt-2 text-[14px] font-light leading-relaxed text-foreground/70">
+                    {xp.summary}
+                  </p>
+                </div>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </div>
       <a
         href={profile.linkedinUrl}
         {...EXT}
@@ -223,7 +245,7 @@ function About() {
   return (
     <section
       id="about"
-      className="w-full border-t border-border/60 bg-surface/40"
+      className="about-bg w-full border-t border-border/60"
     >
       <div className="mx-auto grid w-full max-w-7xl grid-cols-1 items-start gap-12 px-6 py-28 sm:gap-16 lg:grid-cols-[260px_minmax(0,1fr)_minmax(0,1fr)] lg:gap-14 lg:px-10 lg:py-36 xl:gap-20">
         <Reveal className="justify-self-center lg:justify-self-start">

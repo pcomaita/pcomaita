@@ -240,3 +240,16 @@ html.light .shadow-soft {
 #home.grain::before {
   z-index: 1;
 }
+
+/* About section background, reused by the sticky experience dates so they
+   hide the content scrolling underneath (same color as the old bg-surface/40). */
+.about-bg {
+  --about-bg: color-mix(in oklab, var(--surface) 40%, var(--background));
+  background-color: var(--about-bg);
+}
+
+/* Thin, discreet scrollbar for the experience list */
+.exp-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in oklab, var(--muted-foreground) 45%, transparent) transparent;
+}
