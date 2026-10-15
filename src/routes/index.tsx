@@ -7,7 +7,7 @@ import { ATMOSPHERES, featuredProjects, profile } from "@/data/projects";
 import { Contact, EXT, Footer, ProjectGrid, SiteNav } from "@/components/site";
 import { Expertise } from "@/components/expertise";
 import { ExperienceTimeline } from "@/components/experience-timeline";
-import portraitCollage from "@/assets/portrait-collage-v2.webp";
+import portraitBoard from "@/assets/portrait-board.webp";
 
 const DESCRIPTION =
   "Advertising, motion graphics and product animation — explore the 3D work of Paul Comaïta.";
@@ -175,10 +175,10 @@ function About() {
     >
       <div className="mx-auto grid w-full max-w-7xl grid-cols-1 items-start gap-12 px-6 py-28 sm:gap-16 lg:grid-cols-[280px_minmax(0,1fr)_minmax(0,1fr)] lg:gap-14 lg:px-10 lg:py-36 xl:gap-20">
         <Reveal className="justify-self-center lg:justify-self-start">
-          {/* Collage portrait: no frame, the back of the head dissolves to the left,
-              the face is cut out against the page background. */}
+          {/* Standee portrait: the face is cut out and stays fully opaque; only the
+              photo background (sky) fades out to the left. No frame. */}
           <img
-            src={portraitCollage}
+            src={portraitBoard}
             alt={profile.fullName}
             width={520}
             height={624}
