@@ -11,17 +11,24 @@ const GAP = 20;
 const STATION_Y = 13;
 /** The date switches slightly before the dot lands on the station, so the change reads as "arriving". */
 const LEAD = 24;
-/** Easing speeds (per second). Higher = snappier. Time-based, so it feels the same at 60 or 144 Hz. */
-const DOT_SPEED = 9;
-const SCROLL_SPEED = 8;
+/** Duration of one date-to-date step (desktop), in ms. */
+const STEP_DURATION = 700;
+/** Dot follow speed when tracking free scroll (mobile), per second. */
+const FOLLOW_SPEED = 9;
+/** Wheel events closer than this (ms) belong to the same gesture: one gesture = one date. */
+const GESTURE_GAP = 220;
+/** Each step stops this far above the entry, so the top fade only covers the previous entry. */
+const STEP_OFFSET = 24;
+
+const easeInOutCubic = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
 
 /**
  * Experience timeline driven by scroll:
  * - one cyan dot travels down the line as the visitor scrolls, and the line fills behind it;
  * - the entry the dot has reached gets its date highlighted (cyan, larger);
  * - dates are sticky, so the active one stays next to its entry while it scrolls.
- * Desktop: the list scrolls inside a fixed-height area with eased (smooth) wheel scrolling and
- * no visible scrollbar. Mobile: the page scrolls.
+ * Desktop: the list moves one date per wheel notch / swipe (list and dot animate together),
+ * with no visible scrollbar. Mobile: the page scrolls and the dot follows.
  */
 export function ExperienceTimeline() {
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -40,25 +47,41 @@ export function ExperienceTimeline() {
     if (!scroller || !list || !dot || !fill) return;
 
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const count = experiences.length;
     let stations: number[] = [];
+    let rowTops: number[] = [];
     let first = STATION_Y;
     let last = STATION_Y;
-    // dot
+
+    let step = 0; // entry the list is snapped to (desktop)
     let dotY = STATION_Y;
-    let dotTarget = STATION_Y;
-    // eased inner scroll
-    let scrollY = 0;
-    let scrollTarget = 0;
-    let wheeling = false;
+    let dotTarget = STATION_Y; // used when following free scroll (mobile / touch)
+    let tween: {
+      s0: number;
+      s1: number;
+      d0: number;
+      d1: number;
+      t0: number;
+      dur: number;
+    } | null = null;
     let raf = 0;
     let prev = 0;
+    let locked = false; // one step per wheel gesture
+    let lastWheel = 0;
+    let unlockTimer = 0;
+    let idleTimer = 0;
 
-    const innerScroll = () =>
-      getComputedStyle(scroller).overflowY !== "visible" &&
-      scroller.scrollHeight - scroller.clientHeight > 4;
+    const maxScroll = () => scroller.scrollHeight - scroller.clientHeight;
+    const innerScroll = () => getComputedStyle(scroller).overflowY !== "visible" && maxScroll() > 4;
 
     const measure = () => {
-      stations = rowRefs.current.map((li) => (li ? li.offsetTop + STATION_Y : STATION_Y));
+      // Desktop: leave room under the last entry so every date (even the last) can reach the top.
+      const lastRow = rowRefs.current[count - 1];
+      if (getComputedStyle(scroller).overflowY !== "visible" && lastRow) {
+        list.style.paddingBottom = `${Math.max(48, scroller.clientHeight - lastRow.offsetHeight - STEP_OFFSET)}px`;
+      } else list.style.paddingBottom = "";
+      rowTops = rowRefs.current.map((li) => (li ? li.offsetTop : 0));
+      stations = rowTops.map((t) => t + STATION_Y);
       first = stations[0] ?? STATION_Y;
       last = stations[stations.length - 1] ?? first;
       fill.style.top = `${first}px`;
@@ -77,8 +100,8 @@ export function ExperienceTimeline() {
     };
 
     const updateFades = () => {
-      const max = scroller.scrollHeight - scroller.clientHeight;
-      scroller.style.setProperty("--fade-top", scroller.scrollTop > 2 ? "40px" : "0px");
+      const max = maxScroll();
+      scroller.style.setProperty("--fade-top", scroller.scrollTop > 2 ? "28px" : "0px");
       scroller.style.setProperty("--fade-bottom", scroller.scrollTop < max - 2 ? "56px" : "0px");
     };
 
@@ -94,22 +117,21 @@ export function ExperienceTimeline() {
       prev = now;
       let moving = false;
 
-      if (wheeling) {
-        const k = reduced ? 1 : 1 - Math.exp(-SCROLL_SPEED * dt);
-        scrollY += (scrollTarget - scrollY) * k;
-        if (Math.abs(scrollTarget - scrollY) < 0.5) {
-          scrollY = scrollTarget;
-          wheeling = false;
-        } else moving = true;
-        scroller.scrollTop = scrollY;
+      if (tween) {
+        const t = tween.dur > 0 ? Math.min(1, (now - tween.t0) / tween.dur) : 1;
+        const e = easeInOutCubic(t);
+        scroller.scrollTop = tween.s0 + (tween.s1 - tween.s0) * e;
+        dotY = tween.d0 + (tween.d1 - tween.d0) * e;
+        if (t >= 1) tween = null;
+        else moving = true;
+      } else {
+        const k = reduced ? 1 : 1 - Math.exp(-FOLLOW_SPEED * dt);
+        dotY += (dotTarget - dotY) * k;
+        if (Math.abs(dotTarget - dotY) < 0.2) dotY = dotTarget;
+        else moving = true;
       }
 
-      const kd = reduced ? 1 : 1 - Math.exp(-DOT_SPEED * dt);
-      dotY += (dotTarget - dotY) * kd;
-      if (Math.abs(dotTarget - dotY) < 0.2) dotY = dotTarget;
-      else moving = true;
       render();
-
       if (moving) raf = requestAnimationFrame(tick);
       else {
         raf = 0;
@@ -121,50 +143,129 @@ export function ExperienceTimeline() {
       if (!raf) raf = requestAnimationFrame(tick);
     };
 
-    const compute = () => {
-      if (stations.length === 0) measure();
-      let y: number;
-      if (innerScroll()) {
-        // Desktop: map the inner scroll range onto the whole line, first entry to last.
-        const max = scroller.scrollHeight - scroller.clientHeight;
-        y = first + (scroller.scrollTop / max) * (last - first);
-        if (!wheeling) scrollY = scrollTarget = scroller.scrollTop; // keyboard, touch, drag
-        updateFades();
-      } else {
-        // Mobile: the dot sits at the middle of the screen while the list passes under it.
-        y = window.innerHeight * 0.5 - list.getBoundingClientRect().top;
-      }
-      dotTarget = Math.min(last, Math.max(first, y));
+    /** Desktop: scroll the list and move the dot together, straight to entry i. */
+    const goTo = (i: number) => {
+      step = Math.max(0, Math.min(count - 1, i));
+      const s1 = Math.min(maxScroll(), Math.max(0, (rowTops[step] ?? 0) - STEP_OFFSET));
+      const d1 = stations[step] ?? first;
+      tween = {
+        s0: scroller.scrollTop,
+        s1,
+        d0: dotY,
+        d1,
+        t0: performance.now(),
+        dur: reduced ? 0 : STEP_DURATION,
+      };
+      dotTarget = d1;
       start();
     };
 
-    // Eased wheel scrolling inside the list. At either end the wheel is released to the page.
+    /** Entry closest to the current free-scroll position (used after touch / native scroll). */
+    const nearestStep = () => {
+      const max = maxScroll();
+      const y = first + (max > 0 ? scroller.scrollTop / max : 0) * (last - first);
+      let best = 0;
+      stations.forEach((s, i) => {
+        if (Math.abs(s - y) < Math.abs((stations[best] ?? 0) - y)) best = i;
+      });
+      return best;
+    };
+
+    const compute = () => {
+      if (stations.length === 0) measure();
+      if (innerScroll()) {
+        updateFades();
+        if (tween) return; // our own animation is driving the scroll
+        // Free scroll (touch, keyboard outside our handler): follow, then snap to the nearest date.
+        const max = maxScroll();
+        dotTarget = first + (scroller.scrollTop / max) * (last - first);
+        window.clearTimeout(idleTimer);
+        idleTimer = window.setTimeout(() => {
+          if (!tween) goTo(nearestStep());
+        }, 140);
+        start();
+      } else {
+        // Mobile: the page scrolls; the dot sits at the middle of the screen.
+        const y = window.innerHeight * 0.5 - list.getBoundingClientRect().top;
+        dotTarget = Math.min(last, Math.max(first, y));
+        start();
+      }
+    };
+
+    const scheduleUnlock = () => {
+      window.clearTimeout(unlockTimer);
+      unlockTimer = window.setTimeout(function check() {
+        if (!tween && performance.now() - lastWheel >= GESTURE_GAP) locked = false;
+        else unlockTimer = window.setTimeout(check, 60);
+      }, GESTURE_GAP);
+    };
+
+    // Desktop wheel: one notch / one trackpad swipe = one date.
     const onWheel = (e: WheelEvent) => {
       if (!innerScroll() || e.ctrlKey) return;
-      const max = scroller.scrollHeight - scroller.clientHeight;
       const unit = e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? scroller.clientHeight : 1;
       const delta = e.deltaY * unit;
-      const base = wheeling ? scrollTarget : scroller.scrollTop;
-      if ((delta < 0 && base <= 1) || (delta > 0 && base >= max - 1)) return;
+      if (Math.abs(delta) < 2) return;
+      const dir = delta > 0 ? 1 : -1;
+      const now = performance.now();
+      const atEdge = (dir > 0 && step >= count - 1) || (dir < 0 && step <= 0);
+
+      if (locked) {
+        // Same gesture (trackpad inertia or fast notches): swallow it, don't skip dates.
+        e.preventDefault();
+        lastWheel = now;
+        scheduleUnlock();
+        return;
+      }
+      if (atEdge) {
+        // First/last date reached: hand the wheel back to the page.
+        e.preventDefault();
+        window.scrollBy({ top: delta });
+        return;
+      }
       e.preventDefault();
-      if (!wheeling) scrollY = scroller.scrollTop;
-      scrollTarget = Math.min(max, Math.max(0, base + delta));
-      wheeling = true;
-      start();
+      locked = true;
+      lastWheel = now;
+      goTo(step + dir);
+      scheduleUnlock();
+    };
+
+    const onKey = (e: KeyboardEvent) => {
+      if (!innerScroll()) return;
+      const map: Record<string, number> = {
+        ArrowDown: step + 1,
+        PageDown: step + 1,
+        ArrowUp: step - 1,
+        PageUp: step - 1,
+        Home: 0,
+        End: count - 1,
+      };
+      const next = map[e.key];
+      if (next === undefined || next < 0 || next > count - 1 || next === step) return;
+      e.preventDefault();
+      goTo(next);
     };
 
     const onResize = () => {
       measure();
-      compute();
+      if (innerScroll()) {
+        tween = null;
+        scroller.scrollTop = Math.min(maxScroll(), Math.max(0, (rowTops[step] ?? 0) - STEP_OFFSET));
+        dotY = dotTarget = stations[step] ?? first;
+        updateFades();
+        render();
+      } else compute();
     };
 
     measure();
     dotY = dotTarget = first;
-    compute();
+    if (innerScroll()) updateFades();
+    else compute();
     render();
 
     scroller.addEventListener("scroll", compute, { passive: true });
     scroller.addEventListener("wheel", onWheel, { passive: false });
+    scroller.addEventListener("keydown", onKey);
     window.addEventListener("scroll", compute, { passive: true });
     window.addEventListener("resize", onResize);
     const ro = new ResizeObserver(onResize);
@@ -173,9 +274,12 @@ export function ExperienceTimeline() {
     return () => {
       scroller.removeEventListener("scroll", compute);
       scroller.removeEventListener("wheel", onWheel);
+      scroller.removeEventListener("keydown", onKey);
       window.removeEventListener("scroll", compute);
       window.removeEventListener("resize", onResize);
       ro.disconnect();
+      window.clearTimeout(unlockTimer);
+      window.clearTimeout(idleTimer);
       if (raf) cancelAnimationFrame(raf);
     };
   }, []);
@@ -196,7 +300,7 @@ export function ExperienceTimeline() {
           aria-label="Experience timeline (scrollable)"
           className="exp-scroll rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring lg:max-h-[360px] lg:overflow-y-auto"
         >
-          <ol ref={listRef} className="relative lg:pb-12">
+          <ol ref={listRef} className="relative">
             {/* Progress: the line fills in cyan behind the dot */}
             <span
               ref={fillRef}
