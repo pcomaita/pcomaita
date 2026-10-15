@@ -7,6 +7,7 @@ import { ATMOSPHERES, featuredProjects, profile } from "@/data/projects";
 import { Contact, EXT, Footer, ProjectGrid, SiteNav } from "@/components/site";
 import { Expertise } from "@/components/expertise";
 import { ExperienceTimeline } from "@/components/experience-timeline";
+import portraitCollage from "@/assets/portrait-collage-v2.webp";
 
 const DESCRIPTION =
   "Advertising, motion graphics and product animation — explore the 3D work of Paul Comaïta.";
@@ -172,22 +173,19 @@ function About() {
       id="about"
       className="about-bg w-full border-t border-border/60"
     >
-      <div className="mx-auto grid w-full max-w-7xl grid-cols-1 items-start gap-12 px-6 py-28 sm:gap-16 lg:grid-cols-[260px_minmax(0,1fr)_minmax(0,1fr)] lg:gap-14 lg:px-10 lg:py-36 xl:gap-20">
+      <div className="mx-auto grid w-full max-w-7xl grid-cols-1 items-start gap-12 px-6 py-28 sm:gap-16 lg:grid-cols-[280px_minmax(0,1fr)_minmax(0,1fr)] lg:gap-14 lg:px-10 lg:py-36 xl:gap-20">
         <Reveal className="justify-self-center lg:justify-self-start">
-          <div className="relative">
-            <img
-              src={profile.avatar}
-              alt={profile.fullName}
-              width={300}
-              height={360}
-              loading="lazy"
-              className="aspect-[5/6] w-[260px] rounded-2xl object-cover grayscale-[35%] ring-1 ring-primary/50 sm:w-[300px] lg:w-[260px]"
-            />
-            <span
-              className="absolute -inset-3 -z-10 rounded-3xl bg-primary/10 blur-2xl"
-              aria-hidden="true"
-            />
-          </div>
+          {/* Collage portrait: no frame, the back of the head dissolves to the left,
+              the face is cut out against the page background. */}
+          <img
+            src={portraitCollage}
+            alt={profile.fullName}
+            width={520}
+            height={624}
+            loading="lazy"
+            className="aspect-[5/6] w-[280px] select-none object-contain sm:w-[320px] lg:w-[280px]"
+            draggable={false}
+          />
         </Reveal>
 
         <Reveal delay={120}>
