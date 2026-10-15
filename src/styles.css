@@ -248,8 +248,53 @@ html.light .shadow-soft {
   background-color: var(--about-bg);
 }
 
-/* Thin, discreet scrollbar for the experience list */
-.exp-scroll {
-  scrollbar-width: thin;
-  scrollbar-color: color-mix(in oklab, var(--muted-foreground) 45%, transparent) transparent;
+/* Experience list (desktop): no visible scrollbar — the timeline line is the
+   progress indicator. Top/bottom fades appear only when content is hidden there,
+   and the date column is never faded at the top (the active date sits there). */
+@property --fade-top {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+@property --fade-bottom {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 56px;
+}
+@media (min-width: 1024px) {
+  .exp-scroll {
+    scrollbar-width: none;
+    transition:
+      --fade-top 350ms ease,
+      --fade-bottom 350ms ease;
+    -webkit-mask-image:
+      linear-gradient(to bottom, #000 calc(100% - var(--fade-bottom)), transparent),
+      linear-gradient(
+        to bottom,
+        transparent 0,
+        #000 var(--fade-top),
+        #000 calc(100% - var(--fade-bottom)),
+        transparent 100%
+      );
+    mask-image:
+      linear-gradient(to bottom, #000 calc(100% - var(--fade-bottom)), transparent),
+      linear-gradient(
+        to bottom,
+        transparent 0,
+        #000 var(--fade-top),
+        #000 calc(100% - var(--fade-bottom)),
+        transparent 100%
+      );
+    -webkit-mask-size:
+      112px 100%,
+      100% 100%;
+    mask-size:
+      112px 100%,
+      100% 100%;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+  }
+  .exp-scroll::-webkit-scrollbar {
+    display: none;
+  }
 }

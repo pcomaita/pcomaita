@@ -11,20 +11,23 @@ const GAP = 20;
 const STATION_Y = 13;
 /** The date switches slightly before the dot lands on the station, so the change reads as "arriving". */
 const LEAD = 24;
-/** Follow factor of the dot per frame: lower = softer, more "motion design" easing. */
-const EASE = 0.14;
+/** Easing speeds (per second). Higher = snappier. Time-based, so it feels the same at 60 or 144 Hz. */
+const DOT_SPEED = 9;
+const SCROLL_SPEED = 8;
 
 /**
  * Experience timeline driven by scroll:
- * - one cyan dot travels down the line as the visitor scrolls;
+ * - one cyan dot travels down the line as the visitor scrolls, and the line fills behind it;
  * - the entry the dot has reached gets its date highlighted (cyan, larger);
  * - dates are sticky, so the active one stays next to its entry while it scrolls.
- * Desktop: the list scrolls inside a fixed-height area. Mobile: the page scrolls.
+ * Desktop: the list scrolls inside a fixed-height area with eased (smooth) wheel scrolling and
+ * no visible scrollbar. Mobile: the page scrolls.
  */
 export function ExperienceTimeline() {
   const scrollRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<HTMLOListElement>(null);
   const dotRef = useRef<HTMLSpanElement>(null);
+  const fillRef = useRef<HTMLSpanElement>(null);
   const rowRefs = useRef<(HTMLLIElement | null)[]>([]);
   const activeRef = useRef(0);
   const [active, setActive] = useState(0);
@@ -33,16 +36,33 @@ export function ExperienceTimeline() {
     const scroller = scrollRef.current;
     const list = listRef.current;
     const dot = dotRef.current;
-    if (!scroller || !list || !dot) return;
+    const fill = fillRef.current;
+    if (!scroller || !list || !dot || !fill) return;
 
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     let stations: number[] = [];
-    let current = STATION_Y;
-    let target = STATION_Y;
+    let first = STATION_Y;
+    let last = STATION_Y;
+    // dot
+    let dotY = STATION_Y;
+    let dotTarget = STATION_Y;
+    // eased inner scroll
+    let scrollY = 0;
+    let scrollTarget = 0;
+    let wheeling = false;
     let raf = 0;
+    let prev = 0;
+
+    const innerScroll = () =>
+      getComputedStyle(scroller).overflowY !== "visible" &&
+      scroller.scrollHeight - scroller.clientHeight > 4;
 
     const measure = () => {
       stations = rowRefs.current.map((li) => (li ? li.offsetTop + STATION_Y : STATION_Y));
+      first = stations[0] ?? STATION_Y;
+      last = stations[stations.length - 1] ?? first;
+      fill.style.top = `${first}px`;
+      fill.style.height = `${Math.max(0, last - first)}px`;
     };
 
     const updateActive = (y: number) => {
@@ -56,30 +76,81 @@ export function ExperienceTimeline() {
       }
     };
 
-    const tick = () => {
-      current = reduced ? target : current + (target - current) * EASE;
-      if (Math.abs(target - current) < 0.25) current = target;
-      dot.style.transform = `translate3d(0, ${current - 5}px, 0)`;
-      updateActive(current);
-      raf = current === target ? 0 : requestAnimationFrame(tick);
+    const updateFades = () => {
+      const max = scroller.scrollHeight - scroller.clientHeight;
+      scroller.style.setProperty("--fade-top", scroller.scrollTop > 2 ? "40px" : "0px");
+      scroller.style.setProperty("--fade-bottom", scroller.scrollTop < max - 2 ? "56px" : "0px");
+    };
+
+    const render = () => {
+      dot.style.transform = `translate3d(0, ${dotY - 5}px, 0)`;
+      const p = last > first ? (dotY - first) / (last - first) : 0;
+      fill.style.transform = `scaleY(${Math.min(1, Math.max(0, p))})`;
+      updateActive(dotY);
+    };
+
+    const tick = (now: number) => {
+      const dt = prev ? Math.min(0.05, (now - prev) / 1000) : 1 / 60;
+      prev = now;
+      let moving = false;
+
+      if (wheeling) {
+        const k = reduced ? 1 : 1 - Math.exp(-SCROLL_SPEED * dt);
+        scrollY += (scrollTarget - scrollY) * k;
+        if (Math.abs(scrollTarget - scrollY) < 0.5) {
+          scrollY = scrollTarget;
+          wheeling = false;
+        } else moving = true;
+        scroller.scrollTop = scrollY;
+      }
+
+      const kd = reduced ? 1 : 1 - Math.exp(-DOT_SPEED * dt);
+      dotY += (dotTarget - dotY) * kd;
+      if (Math.abs(dotTarget - dotY) < 0.2) dotY = dotTarget;
+      else moving = true;
+      render();
+
+      if (moving) raf = requestAnimationFrame(tick);
+      else {
+        raf = 0;
+        prev = 0;
+      }
+    };
+
+    const start = () => {
+      if (!raf) raf = requestAnimationFrame(tick);
     };
 
     const compute = () => {
       if (stations.length === 0) measure();
-      const first = stations[0] ?? STATION_Y;
-      const last = stations[stations.length - 1] ?? first;
-      const maxScroll = scroller.scrollHeight - scroller.clientHeight;
-      const innerScroll = getComputedStyle(scroller).overflowY !== "visible" && maxScroll > 4;
       let y: number;
-      if (innerScroll) {
+      if (innerScroll()) {
         // Desktop: map the inner scroll range onto the whole line, first entry to last.
-        y = first + (scroller.scrollTop / maxScroll) * (last - first);
+        const max = scroller.scrollHeight - scroller.clientHeight;
+        y = first + (scroller.scrollTop / max) * (last - first);
+        if (!wheeling) scrollY = scrollTarget = scroller.scrollTop; // keyboard, touch, drag
+        updateFades();
       } else {
         // Mobile: the dot sits at the middle of the screen while the list passes under it.
         y = window.innerHeight * 0.5 - list.getBoundingClientRect().top;
       }
-      target = Math.min(last, Math.max(first, y));
-      if (!raf) raf = requestAnimationFrame(tick);
+      dotTarget = Math.min(last, Math.max(first, y));
+      start();
+    };
+
+    // Eased wheel scrolling inside the list. At either end the wheel is released to the page.
+    const onWheel = (e: WheelEvent) => {
+      if (!innerScroll() || e.ctrlKey) return;
+      const max = scroller.scrollHeight - scroller.clientHeight;
+      const unit = e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? scroller.clientHeight : 1;
+      const delta = e.deltaY * unit;
+      const base = wheeling ? scrollTarget : scroller.scrollTop;
+      if ((delta < 0 && base <= 1) || (delta > 0 && base >= max - 1)) return;
+      e.preventDefault();
+      if (!wheeling) scrollY = scroller.scrollTop;
+      scrollTarget = Math.min(max, Math.max(0, base + delta));
+      wheeling = true;
+      start();
     };
 
     const onResize = () => {
@@ -88,10 +159,12 @@ export function ExperienceTimeline() {
     };
 
     measure();
-    current = target = stations[0] ?? STATION_Y;
+    dotY = dotTarget = first;
     compute();
+    render();
 
     scroller.addEventListener("scroll", compute, { passive: true });
+    scroller.addEventListener("wheel", onWheel, { passive: false });
     window.addEventListener("scroll", compute, { passive: true });
     window.addEventListener("resize", onResize);
     const ro = new ResizeObserver(onResize);
@@ -99,6 +172,7 @@ export function ExperienceTimeline() {
 
     return () => {
       scroller.removeEventListener("scroll", compute);
+      scroller.removeEventListener("wheel", onWheel);
       window.removeEventListener("scroll", compute);
       window.removeEventListener("resize", onResize);
       ro.disconnect();
@@ -120,9 +194,16 @@ export function ExperienceTimeline() {
           ref={scrollRef}
           tabIndex={0}
           aria-label="Experience timeline (scrollable)"
-          className="exp-scroll rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring lg:max-h-[360px] lg:overflow-y-auto lg:overscroll-contain lg:pr-3 lg:[mask-image:linear-gradient(to_bottom,black_calc(100%-48px),transparent)]"
+          className="exp-scroll rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring lg:max-h-[360px] lg:overflow-y-auto"
         >
           <ol ref={listRef} className="relative lg:pb-12">
+            {/* Progress: the line fills in cyan behind the dot */}
+            <span
+              ref={fillRef}
+              aria-hidden="true"
+              className="pointer-events-none absolute z-[15] w-px origin-top bg-primary/70 will-change-transform"
+              style={{ left: DATE_COL + GAP, top: STATION_Y, transform: "scaleY(0)" }}
+            />
             {/* Travelling dot */}
             <span
               ref={dotRef}
