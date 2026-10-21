@@ -32,25 +32,15 @@ Navigation et layout global :
 
 - Pas de sidebars
 
-This project was built with [Lovable](https://lovable.dev).
-
-**Live app**: https://ta-3d-showcase.lovable.app
-
-## Build with Lovable
-
-Continue developing this project in the [Lovable editor](https://lovable.dev/projects/1715e17b-995f-446a-aaef-521b170053b6).
-
-- **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: every change made in Lovable is committed straight to this repository.
-- **Full ownership**: this code is yours. Push to `main` on GitHub and your changes sync back into Lovable, ready for your next prompt.
-
 ## Development
 
-Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
+You need Node.js and Bun (the lockfile is `bun.lock`).
 
 ```sh
-git clone <this-repository-url>
-cd <repository-name>
-npm i
-npm run dev
+git clone https://github.com/pcomaita/ta-3d-showcase
+cd ta-3d-showcase
+bun install
+bun run dev
 ```
+
+Build the static site with `bun run build`. The output is written to `dist/client`.
