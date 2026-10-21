@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { Reveal } from "@/components/Reveal";
-import { ProjectModal } from "@/components/site";
+import { Link } from "@tanstack/react-router";
 import { BLENDER_PATH, DAVINCI_RESOLVE_PATH, NUKE_PATH } from "@/components/tool-icon-paths";
-import { projects, type Project } from "@/data/projects";
+import { projects } from "@/data/projects";
 
 type StepId = "modeling" | "texturing" | "animation" | "lighting" | "compositing" | "editing";
 
@@ -76,12 +76,11 @@ function ToolIcon({ icon }: { icon: Tool["icon"] }) {
 
 export function Expertise() {
   const [active, setActive] = useState<string>("Blender");
-  const [openProject, setOpenProject] = useState<Project | null>(null);
 
   const tool: Tool = TOOLS.find((t) => t.name === active) ?? (TOOLS[0] as Tool);
   const usedIn = projects
     .filter((p) => p.software.includes(tool.name))
-    .sort((a, b) => b.year - a.year || a.order - b.order);
+    .sort((a, b) => b.year - a.year);
 
   return (
     <div className="border-t border-border/40 bg-primary/[0.04]">
@@ -184,14 +183,14 @@ export function Expertise() {
               <p className="mt-3 flex flex-wrap items-baseline gap-x-1.5 gap-y-1 text-[13px] font-light text-muted-foreground">
                 <span className="tracking-wide">Used in:</span>
                 {usedIn.map((p, i) => (
-                  <span key={p.id}>
-                    <button
-                      type="button"
-                      onClick={() => setOpenProject(p)}
+                  <span key={p.slug}>
+                    <Link
+                      to="/work/$slug"
+                      params={{ slug: p.slug }}
                       className="text-foreground/85 underline-offset-4 transition-colors duration-200 hover:text-primary hover:underline focus-visible:text-primary focus-visible:underline focus-visible:outline-none"
                     >
                       {p.title}
-                    </button>
+                    </Link>
                     {i < usedIn.length - 1 && <span aria-hidden="true">,</span>}
                   </span>
                 ))}
@@ -200,8 +199,6 @@ export function Expertise() {
           </div>
         </Reveal>
       </div>
-
-      {openProject && <ProjectModal project={openProject} onClose={() => setOpenProject(null)} />}
     </div>
   );
 }

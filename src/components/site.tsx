@@ -1,24 +1,15 @@
 import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { ArrowUpRight, Lightbulb, LightbulbOff, Play, X } from "lucide-react";
+import { ArrowUpRight, Lightbulb, LightbulbOff } from "lucide-react";
 import { Reveal } from "@/components/Reveal";
-import {
-  categories,
-  profile,
-  type Project,
-  type ProjectCategory,
-  type ProjectClient,
-} from "@/data/projects";
+import { profile, type Project, type ProjectClient } from "@/data/projects";
 
 export const NAV_LINKS = [
   { label: "Home", href: "/" },
-  { label: "Work", href: "/work" },
+  { label: "Work", href: "/#work" },
   { label: "About", href: "/#about" },
   { label: "Contact", href: "/#contact" },
 ];
-
-type Filter = "All" | ProjectCategory;
-const FILTERS: Filter[] = ["All", ...categories];
 
 export const EXT = { target: "_blank", rel: "noopener noreferrer" } as const;
 
@@ -111,21 +102,12 @@ export function SiteNav({ overHero = false }: { overHero?: boolean }) {
         <ul className="flex items-center gap-3 sm:gap-8">
           {NAV_LINKS.map((link) => (
             <li key={link.href} className="hidden sm:block">
-              {link.href === "/work" ? (
-                <Link
-                  to="/work"
-                  className="text-[13px] font-normal tracking-[0.14em] uppercase text-muted-foreground transition-colors hover:text-foreground"
-                >
-                  {link.label}
-                </Link>
-              ) : (
-                <a
-                  href={link.href}
-                  className="text-[13px] font-normal tracking-[0.14em] uppercase text-muted-foreground transition-colors hover:text-foreground"
-                >
-                  {link.label}
-                </a>
-              )}
+              <a
+                href={link.href}
+                className="text-[13px] font-normal tracking-[0.14em] uppercase text-muted-foreground transition-colors hover:text-foreground"
+              >
+                {link.label}
+              </a>
             </li>
           ))}
           <li>
@@ -145,294 +127,103 @@ export function SiteNav({ overHero = false }: { overHero?: boolean }) {
   );
 }
 
-function ClientLine({ client }: { client: ProjectClient }) {
+/** `linked={false}` inside a card that is itself a link (no nested <a>). */
+function ClientLine({ client, linked = true }: { client: ProjectClient; linked?: boolean }) {
   return (
-    <div className="mt-3 text-[13px] font-light leading-relaxed">
-      <p className="text-foreground/85">
-        Client:{" "}
+    <p className="text-[13px] font-light text-foreground/85">
+      Client:{" "}
+      {!linked ? (
+        client.name
+      ) : (
         <a
           href={client.url}
           {...EXT}
-          onClick={(e) => e.stopPropagation()}
           className="underline-offset-4 transition-colors duration-300 hover:text-primary hover:underline"
         >
           {client.name}
         </a>
-      </p>
-      <p className="mt-0.5 text-muted-foreground">
-        {client.contextUrl ? (
-          <a
-            href={client.contextUrl}
-            {...EXT}
-            onClick={(e) => e.stopPropagation()}
-            className="underline-offset-4 transition-colors duration-300 hover:text-primary hover:underline"
-          >
-            {client.context}
-          </a>
-        ) : (
-          client.context
-        )}
-      </p>
-    </div>
-  );
-}
-
-export function ProjectModal({
-  project,
-  onClose,
-}: {
-  project: Project;
-  onClose: () => void;
-}) {
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    };
-    window.addEventListener("keydown", onKey);
-    document.body.style.overflow = "hidden";
-    return () => {
-      window.removeEventListener("keydown", onKey);
-      document.body.style.overflow = "";
-    };
-  }, [onClose]);
-
-  const video = project.video;
-
-  return (
-    <div
-      className="fixed inset-0 z-[70] flex items-center justify-center p-4 sm:p-8"
-      role="dialog"
-      aria-modal="true"
-      aria-label={`Project ${project.title}`}
-    >
-      <div
-        className="absolute inset-0 animate-in fade-in duration-300 bg-background/85 backdrop-blur-sm"
-        onClick={onClose}
-      />
-      <div className="animate-in fade-in zoom-in-95 duration-300 shadow-soft relative max-h-full w-full max-w-3xl overflow-y-auto rounded-lg border border-border/60 bg-surface">
-        <button
-          onClick={onClose}
-          aria-label="Close"
-          className="absolute right-4 top-4 z-10 flex size-9 items-center justify-center rounded-full border border-border bg-background/70 text-foreground backdrop-blur-sm transition-colors duration-300 hover:border-primary/50 hover:text-primary"
-        >
-          <X className="size-4" />
-        </button>
-
-        <div className="relative aspect-video overflow-hidden">
-          {video && video.stable ? (
-            <iframe
-              src={video.embedUrl}
-              title={`${project.title} — video`}
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-              className="h-full w-full"
-            />
-          ) : (
-            <>
-              <img
-                src={video ? video.poster : project.cover}
-                alt={`${project.title} — ${project.category}`}
-                className="h-full w-full object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-surface via-transparent to-transparent" />
-              {video && (
-                <a
-                  href={project.artstationUrl}
-                  {...EXT}
-                  className="absolute inset-0 flex items-center justify-center"
-                >
-                  <span className="flex items-center gap-2 rounded-full border border-border/60 bg-background/70 px-4 py-2 text-[11px] tracking-[0.16em] uppercase text-foreground transition-colors duration-300 hover:text-primary">
-                    <Play className="size-3.5" />
-                    Watch the animation on ArtStation
-                  </span>
-                </a>
-              )}
-            </>
-          )}
-        </div>
-
-        <div className="px-6 pb-8 pt-4 sm:px-8">
-          <p className="text-[11px] tracking-[0.3em] uppercase text-primary">
-            {project.category} · {project.year} · {project.projectType}
-          </p>
-          <h3 className="mt-3 font-display text-2xl font-medium tracking-tight text-foreground sm:text-3xl">
-            {project.title}
-          </h3>
-          {project.client && <ClientLine client={project.client} />}
-
-          {project.images.length > 0 && (
-            <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
-              {project.images.map((src, i) => (
-                <img
-                  key={src}
-                  src={src}
-                  alt={`${project.title} — image ${i + 1}`}
-                  loading="lazy"
-                  className="w-full rounded-md border border-border/60 object-cover"
-                />
-              ))}
-            </div>
-          )}
-
-          <p className="mt-6 max-w-2xl text-sm font-light leading-relaxed text-muted-foreground sm:text-base">
-            {project.description}
-          </p>
-          {project.role && (
-            <p className="mt-4 text-sm font-light text-foreground/85">
-              Role: {project.role}
-            </p>
-          )}
-
-          <div className="mt-6 flex flex-wrap gap-2">
-            {project.software.map((tool) => (
-              <span
-                key={tool}
-                className="rounded-full border border-border bg-background px-3.5 py-1.5 text-[12px] font-light text-muted-foreground"
-              >
-                {tool}
-              </span>
-            ))}
-          </div>
-
-          <a
-            href={project.artstationUrl}
-            {...EXT}
-            className="group mt-8 inline-flex items-center gap-2.5 rounded-full bg-foreground px-6 py-2.5 text-sm font-medium tracking-wide text-background transition-all duration-300 hover:bg-primary hover:text-primary-foreground"
-          >
-            View on ArtStation
-            <ArrowUpRight className="size-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-          </a>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-export function ProjectCard({ project, onOpen }: { project: Project; onOpen: (p: Project) => void }) {
-  return (
-              <div
-                role="button"
-                tabIndex={0}
-                onClick={() => onOpen(project)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault();
-                    onOpen(project);
-                  }
-                }}
-                className="group block h-full w-full cursor-pointer overflow-hidden rounded-lg border border-border/60 bg-surface text-left shadow-soft transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:bg-surface-raised"
-              >
-                <div className="relative aspect-video overflow-hidden">
-                  <img
-                    src={project.cover}
-                    alt={`${project.title} — ${project.category}`}
-                    loading="lazy"
-                    className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-background/70 via-transparent to-transparent opacity-80" />
-                  <span className="absolute left-3 top-3 rounded-full border border-border/60 bg-background/70 px-2.5 py-1 text-[10px] tracking-[0.14em] uppercase text-foreground/85 backdrop-blur-sm">
-                    {project.projectType}
-                  </span>
-                  <span className="absolute inset-0 flex items-center justify-center bg-background/30 opacity-0 backdrop-blur-[2px] transition-opacity duration-300 group-hover:opacity-100">
-                    <span className="flex items-center gap-2 rounded-full border border-border/60 bg-background/70 px-4 py-2 text-[11px] tracking-[0.16em] uppercase text-foreground">
-                      {project.video ? (
-                        <Play className="size-3.5" />
-                      ) : (
-                        <ArrowUpRight className="size-3.5" />
-                      )}
-                      {project.video ? "Watch the video" : "View project"}
-                    </span>
-                  </span>
-                </div>
-                <div className="px-5 py-5">
-                  <div className="flex items-baseline justify-between gap-4">
-                    <h3 className="font-display text-base font-medium text-foreground sm:text-lg">
-                      {project.title}
-                    </h3>
-                    <span className="text-sm font-light text-muted-foreground">
-                      {project.year}
-                    </span>
-                  </div>
-                  <p className="mt-1.5 text-sm font-light leading-relaxed text-muted-foreground">
-                    {project.excerpt}
-                  </p>
-                  {project.client && <ClientLine client={project.client} />}
-                  <div className="mt-4 flex flex-wrap gap-1.5">
-                    {project.software.map((tool) => (
-                      <span
-                        key={tool}
-                        className="rounded-full border border-border bg-background px-2.5 py-1 text-[11px] font-light text-muted-foreground"
-                      >
-                        {tool}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </div>
-  );
-}
-
-export function ProjectGrid({
-  items,
-  columns,
-  withFilters,
-}: {
-  items: Project[];
-  columns: 2 | 3;
-  withFilters?: boolean;
-}) {
-  const [activeCategory, setActiveCategory] = useState<Filter>("All");
-  const [selected, setSelected] = useState<Project | null>(null);
-  const visible =
-    activeCategory === "All" ? items : items.filter((p) => p.category === activeCategory);
-
-  return (
-    <>
-      {withFilters && (
-        <Reveal delay={120}>
-          <div className="mt-12 flex flex-wrap gap-2.5" role="group" aria-label="Project filters">
-            {FILTERS.map((category) => {
-              const isActive = category === activeCategory;
-              return (
-                <button
-                  key={category}
-                  onClick={() => setActiveCategory(category)}
-                  aria-pressed={isActive}
-                  className={`rounded-full border px-4 py-1.5 text-[13px] tracking-[0.08em] transition-all duration-300 ${
-                    isActive
-                      ? "border-primary bg-primary text-primary-foreground"
-                      : "border-border bg-background text-muted-foreground hover:border-primary/40 hover:text-foreground"
-                  }`}
-                >
-                  {category}
-                </button>
-              );
-            })}
-          </div>
-        </Reveal>
       )}
-
-      <div
-        className={`mt-12 grid grid-cols-1 gap-8 ${
-          columns === 3 ? "sm:grid-cols-2 lg:grid-cols-3" : "lg:grid-cols-2"
-        }`}
-      >
-        {visible.map((project, i) => (
-          <Reveal key={project.id} delay={(i % columns) * 100}>
-            <ProjectCard project={project} onOpen={setSelected} />
-          </Reveal>
-        ))}
-      </div>
-
-      {selected && <ProjectModal project={selected} onClose={() => setSelected(null)} />}
-    </>
+    </p>
   );
 }
 
+export { ClientLine };
+
+/** Homepage card: the whole card links to the project's case study page. */
+export function ProjectCard({ project }: { project: Project }) {
+  return (
+    <Link
+      to="/work/$slug"
+      params={{ slug: project.slug }}
+      className="group block h-full w-full overflow-hidden rounded-lg border border-border/60 bg-surface text-left shadow-soft transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:bg-surface-raised focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+    >
+      <div className="relative aspect-video overflow-hidden">
+        <img
+          src={project.cover}
+          alt={`${project.title} — ${project.subtitle}`}
+          loading="lazy"
+          className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-background/70 via-transparent to-transparent opacity-80" />
+        <span className="absolute left-3 top-3 rounded-full border border-border/60 bg-background/70 px-2.5 py-1 text-[10px] tracking-[0.14em] uppercase text-foreground/85 backdrop-blur-sm">
+          {project.projectType}
+        </span>
+        <span className="absolute inset-0 flex items-center justify-center bg-background/30 opacity-0 backdrop-blur-[2px] transition-opacity duration-300 group-hover:opacity-100">
+          <span className="flex items-center gap-2 rounded-full border border-border/60 bg-background/70 px-4 py-2 text-[11px] tracking-[0.16em] uppercase text-foreground">
+            <ArrowUpRight className="size-3.5" />
+            View case study
+          </span>
+        </span>
+      </div>
+      <div className="px-5 py-5">
+        <div className="flex items-baseline justify-between gap-4">
+          <h3 className="font-display text-base font-medium text-foreground sm:text-lg">
+            {project.title}
+            <span className="font-normal text-muted-foreground"> — {project.subtitle}</span>
+          </h3>
+          <span className="text-sm font-light text-muted-foreground">{project.year}</span>
+        </div>
+        <p className="mt-1.5 text-sm font-light leading-relaxed text-muted-foreground">
+          {project.excerpt}
+        </p>
+        {project.client && (
+          <div className="mt-3">
+            <ClientLine client={project.client} linked={false} />
+          </div>
+        )}
+        <div className="mt-4 flex flex-wrap gap-1.5">
+          {project.software.map((tool) => (
+            <span
+              key={tool}
+              className="rounded-full border border-border bg-background px-2.5 py-1 text-[11px] font-light text-muted-foreground"
+            >
+              {tool}
+            </span>
+          ))}
+        </div>
+      </div>
+    </Link>
+  );
+}
+
+export function ProjectGrid({ items }: { items: Project[] }) {
+  return (
+    <div className="mt-12 grid grid-cols-1 gap-8 lg:grid-cols-2">
+      {items.map((project, i) => (
+        <Reveal key={project.slug} delay={(i % 2) * 100}>
+          <ProjectCard project={project} />
+        </Reveal>
+      ))}
+    </div>
+  );
+}
+
+/** Social links. Instagram only appears once its URL is set in src/data/projects.ts. */
 const CONTACT_SOCIALS = [
   { label: "ArtStation", href: profile.artstationUrl },
   { label: "LinkedIn", href: profile.linkedinUrl },
-];
+  { label: "Instagram", href: profile.instagramUrl },
+].filter((link) => link.href);
 
 export function Contact() {
   return (
@@ -443,23 +234,29 @@ export function Contact() {
       <div className="pointer-events-none absolute left-1/2 top-1/2 size-[560px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/10 blur-[140px]" />
       <div className="relative mx-auto flex w-full max-w-4xl flex-col items-center px-6 py-32 text-center lg:py-44">
         <Reveal>
-          <p className="text-[12px] tracking-[0.35em] uppercase text-primary">
-            Contact
-          </p>
+          <p className="text-[12px] tracking-[0.35em] uppercase text-primary">Contact</p>
           <h2 className="mt-6 font-display text-5xl font-medium tracking-tight text-foreground sm:text-6xl">
             Get in touch
           </h2>
           <p className="mx-auto mt-6 max-w-md text-base font-light text-muted-foreground">
-            Advertising, motion design, product animation — tell me about your
-            idea and I&apos;ll bring it to life.
+            Advertising, motion design, product animation — tell me about your idea and I&apos;ll
+            bring it to life.
           </p>
           <a
-            href="mailto:contact@paulcomaita.art"
+            href={`mailto:${profile.email}`}
             className="group mt-10 inline-flex items-center gap-3 rounded-full border border-foreground/80 bg-transparent px-8 py-3.5 text-sm font-medium tracking-wide text-foreground transition-all duration-300 hover:scale-[1.05] hover:border-foreground hover:bg-foreground hover:text-background"
           >
             Contact me
             <ArrowUpRight className="size-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
           </a>
+          <p className="mt-5">
+            <a
+              href={`mailto:${profile.email}`}
+              className="text-sm font-light tracking-wide text-muted-foreground underline-offset-4 transition-colors duration-300 hover:text-primary hover:underline"
+            >
+              {profile.email}
+            </a>
+          </p>
 
           <ul className="mt-12 flex flex-wrap items-center justify-center gap-x-8 gap-y-4">
             {CONTACT_SOCIALS.map(({ label, href }) => (
@@ -502,6 +299,14 @@ export function Footer() {
               </a>
             </li>
           ))}
+          <li>
+            <a
+              href={`mailto:${profile.email}`}
+              className="text-[12px] tracking-[0.14em] uppercase text-muted-foreground transition-colors duration-300 hover:text-primary"
+            >
+              Email
+            </a>
+          </li>
         </ul>
       </div>
     </footer>

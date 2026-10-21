@@ -1,9 +1,9 @@
-// Projects are loaded from src/data/projects.ts
+// Homepage: hero, the four case studies, About (+ Experience, Expertise), Contact.
 import { useEffect, useRef, useState } from "react";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { ArrowDown } from "lucide-react";
 import { Reveal } from "@/components/Reveal";
-import { ATMOSPHERES, featuredProjects, profile } from "@/data/projects";
+import { ATMOSPHERES, profile, projects } from "@/data/projects";
 import { Contact, EXT, Footer, ProjectGrid, SiteNav } from "@/components/site";
 import { Expertise } from "@/components/expertise";
 import { ExperienceTimeline } from "@/components/experience-timeline";
@@ -34,7 +34,9 @@ function Hero() {
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const saveData =
       "connection" in navigator &&
-      Boolean((navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData);
+      Boolean(
+        (navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData,
+      );
     if (reduced || saveData) return;
     const mobile = window.matchMedia("(max-width: 767px)").matches;
     setVideoSrc(mobile ? "/hero-mobile.mp4" : "/hero-desktop.mp4");
@@ -104,10 +106,7 @@ function Hero() {
         >
           3D Artist &amp; Art Director — Blender, Motion &amp; Cinematic
         </p>
-        <div
-          className="hero-rise pointer-events-auto mt-10"
-          style={{ animationDelay: "500ms" }}
-        >
+        <div className="hero-rise pointer-events-auto mt-10" style={{ animationDelay: "500ms" }}>
           <a
             href="#work"
             className="group inline-flex items-center gap-3 rounded-full bg-foreground px-7 py-3 text-sm font-medium tracking-wide text-background transition-all hover:bg-primary hover:text-primary-foreground"
@@ -120,9 +119,7 @@ function Hero() {
 
       {/* Scroll hint */}
       <div className="absolute bottom-10 left-1/2 z-10 flex -translate-x-1/2 flex-col items-center gap-3">
-        <span className="text-[10px] tracking-[0.3em] uppercase text-muted-foreground">
-          Scroll
-        </span>
+        <span className="text-[10px] tracking-[0.3em] uppercase text-muted-foreground">Scroll</span>
         <span className="scroll-hint block h-12 w-px bg-primary/70" />
       </div>
     </section>
@@ -136,31 +133,19 @@ function Portfolio() {
         <Reveal>
           <div className="flex items-end justify-between gap-6">
             <div>
-              <p className="text-[12px] tracking-[0.35em] uppercase text-primary">
-                Work
-              </p>
+              <p className="text-[12px] tracking-[0.35em] uppercase text-primary">Work</p>
               <h2 className="mt-4 font-display text-4xl font-medium tracking-tight text-foreground sm:text-5xl">
                 Selected projects
               </h2>
             </div>
             <p className="hidden max-w-xs text-sm font-light text-muted-foreground md:block">
-              Advertising, product films, automotive and cinematic work —
-              from concept to final render.
+              Advertising, product films, automotive and cinematic work — from concept to final
+              render.
             </p>
           </div>
         </Reveal>
 
-        <ProjectGrid items={featuredProjects} columns={2} />
-
-        <div className="mt-16 flex justify-center">
-          <Link
-            to="/work"
-            className="group inline-flex items-center gap-3 rounded-full bg-foreground px-7 py-3 text-sm font-medium tracking-wide text-background transition-all hover:bg-primary hover:text-primary-foreground"
-          >
-            View all projects
-            <span aria-hidden="true" className="transition-transform group-hover:translate-x-0.5">→</span>
-          </Link>
-        </div>
+        <ProjectGrid items={projects} />
       </div>
     </section>
   );
@@ -168,10 +153,7 @@ function Portfolio() {
 
 function About() {
   return (
-    <section
-      id="about"
-      className="about-bg w-full border-t border-border/60"
-    >
+    <section id="about" className="about-bg w-full border-t border-border/60">
       <div className="mx-auto grid w-full max-w-7xl grid-cols-1 items-start gap-12 px-6 py-28 sm:gap-16 lg:grid-cols-[260px_minmax(0,1fr)_minmax(0,1fr)] lg:gap-14 lg:px-10 lg:py-36 xl:gap-20">
         <Reveal className="justify-self-center lg:justify-self-start">
           <div className="relative">
@@ -191,24 +173,20 @@ function About() {
         </Reveal>
 
         <Reveal delay={120}>
-          <p className="text-[12px] tracking-[0.35em] uppercase text-primary">
-            About
-          </p>
+          <p className="text-[12px] tracking-[0.35em] uppercase text-primary">About</p>
           <h2 className="mt-4 font-display text-3xl font-medium tracking-tight text-foreground sm:text-4xl">
             About
           </h2>
           <p className="mt-8 max-w-[620px] text-[17px] font-light leading-[1.8] text-foreground/75">
-            I&apos;m a 3D artist specialising in advertising and art direction.
-            Passionate about creating immersive images and visual storytelling,
-            I explore the potential of 3D in advertising, motion graphics and
-            product animation.
+            I&apos;m a 3D artist specialising in advertising and art direction. Passionate about
+            creating immersive images and visual storytelling, I explore the potential of 3D in
+            advertising, motion graphics and product animation.
           </p>
           <p className="mt-6 text-[15px] font-light tracking-wide text-muted-foreground">
             Master&apos;s in 3D Animation &amp; Production — IIM
           </p>
           <p className="mt-4 text-[15px] font-light tracking-wide text-muted-foreground">
-            Based in Paris — available for full-time, contract and freelance
-            work.
+            Based in Paris — available for full-time, contract and freelance work.
           </p>
           <p className="mt-3 text-[15px] font-light tracking-wide text-muted-foreground">
             I&apos;ve worked with the agency{" "}
@@ -242,6 +220,17 @@ function About() {
 }
 
 function Index() {
+  // The homepage renders client-side, so the browser's own jump to "/#work" (from a
+  // case study page) happens before the sections exist. Redo it once they are mounted.
+  useEffect(() => {
+    const id = window.location.hash.slice(1);
+    if (!id) return;
+    const t = window.setTimeout(() => {
+      document.getElementById(id)?.scrollIntoView({ behavior: "auto", block: "start" });
+    }, 60);
+    return () => window.clearTimeout(t);
+  }, []);
+
   return (
     <div className="min-h-screen w-full bg-background text-foreground">
       <SiteNav overHero />

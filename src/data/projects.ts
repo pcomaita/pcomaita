@@ -1,74 +1,59 @@
 // src/data/projects.ts
-// Extracted from ArtStation album "paul_comaita" / album 1888849
-// Extraction date: 2026-10-02 — 8 projects
-// Descriptions are Paul's own ArtStation copy, lightly edited for grammar.
-// No context has been added that is not present in the source posts.
+// The four case studies shown on the site, in display order.
+// Case study copy comes from Paul's brief (October 2026). Do not add facts,
+// metrics or results that are not in the brief.
+// Media (cover, images, videos) are Paul's own ArtStation / YouTube uploads.
 
 import portraitPaul from "@/assets/portrait-paul.jpg";
 
-export type ProjectCategory =
-  | "Advertising & Product"
-  | "Automotive"
-  | "Film & VFX"
-  | "Motion & Assets";
-
-/**
- * Honest provenance label, shown on the card.
- * - "Client work"      : paid commission
- * - "Study case"       : self-initiated brief on a real brand, not commissioned
- * - "Personal project" : own initiative, no brand brief
- * - "Student film"     : produced during studies
- */
-export type ProjectType =
-  | "Client work"
-  | "Study case"
-  | "Personal project"
-  | "Student film";
+/** Honest provenance label, shown on the card and the case study. */
+export type ProjectType = "Client work" | "Self-initiated project" | "Personal project";
 
 export interface ProjectVideo {
-  /** youtube = stable embed. artstation = signed URL, expires. */
+  /** youtube = stable embed. artstation = signed URL that expires: link out instead. */
   provider: "youtube" | "artstation";
   embedUrl: string;
   /** Still shown before play, and fallback when the embed cannot be used. */
   poster: string;
-  /** false => do not rely on this embed in production. */
+  /** false => do not embed in production; show the poster and link to ArtStation. */
   stable: boolean;
-}
-
-export interface Project {
-  id: string;
-  slug: string;
-  title: string;
-  year: number;
-  category: ProjectCategory;
-  projectType: ProjectType;
-  /** One-line summary for the card. */
-  excerpt: string;
-  /** Full copy for the detail view. */
-  description: string;
-  cover: string;
-  images: string[];
-  video?: ProjectVideo;
-  software: string[];
-  /** Only set when projectType === "Client work". */
-  client?: ProjectClient;
-  role?: string;
-  artstationUrl: string;
-  featured: boolean;
-  /** Display order among featured projects on the homepage (lower first). */
-  order: number;
 }
 
 export interface ProjectClient {
   /** The commissioning party — who actually paid for the work. */
   name: string;
   url: string;
-  /** Where the work was published / what it served. Never implies a direct client relationship. */
-  context: string;
+  /** Where the work was published / what it served. */
+  context?: string;
   contextUrl?: string;
 }
 
-/** Commissioning agency behind the Microsoft ExpertZone France content. */
+export interface CaseStudy {
+  context: string;
+  approach: string;
+  result: string;
+  learnings: string;
+}
+
+export interface Project {
+  slug: string;
+  title: string;
+  subtitle: string;
+  year: number;
+  projectType: ProjectType;
+  /** Only set for client work. */
+  client?: ProjectClient;
+  /** One line for the homepage card. */
+  excerpt: string;
+  cover: string;
+  images: string[];
+  video?: ProjectVideo;
+  software: string[];
+  artstationUrl: string;
+  caseStudy: CaseStudy;
+}
+
+/** Commissioning agency (also mentioned in the About section). */
 export const ATMOSPHERES: ProjectClient = {
   name: "Atmosphères",
   url: "https://atmospheres.tm.fr/",
@@ -81,65 +66,23 @@ export const profile = {
   headline: "3D Artist",
   city: "Paris",
   country: "France",
-  availability: "available",
-  availableFullTime: true,
-  availableContract: true,
-  availableFreelance: true,
+  email: "contact@paulcomaita.art",
   artstationUrl: "https://www.artstation.com/paul_comaita",
   linkedinUrl: "https://www.linkedin.com/in/paul-comaita",
-  websiteUrl: "https://paulc.framer.website/",
+  /** [PLACEHOLDER] Instagram URL to be provided by Paul. The link stays hidden while empty. */
+  instagramUrl: "",
   avatar: portraitPaul,
 } as const;
 
-export const categories: ProjectCategory[] = [
-  "Advertising & Product",
-  "Automotive",
-  "Film & VFX",
-  "Motion & Assets",
-];
-
 export const projects: Project[] = [
   {
-    id: "QxXRaE",
-    slug: "the-enchained-crown",
-    title: "The Enchained Crown",
+    slug: "galaxy-book",
+    title: "Samsung Galaxy Book 6",
+    subtitle: "Vertical Teaser",
     year: 2026,
-    category: "Film & VFX",
-    projectType: "Personal project",
-    excerpt: "A short 3D cinematic loop: a crown held up by chains.",
-    description:
-      "A short 3D cinematic loop: a crown held up by chains, light beams cutting through fog, embers floating in the air. It represents ambition under pressure. The crown is the goal; the chains are the effort and sacrifices that never show in the final result; the fire is the drive that pushes forward, but can also burn out. A personal project: no client, no brief.",
-    cover:
-      "https://cdna.artstation.com/p/assets/images/images/102/256/152/large/paul-comaita-01.webp?1788885737",
-    images: [
-      "https://cdna.artstation.com/p/assets/images/images/102/256/152/large/paul-comaita-01.webp?1788885737",
-      "https://cdna.artstation.com/p/assets/images/images/102/256/164/large/paul-comaita-02.webp?1788885750",
-      "https://cdna.artstation.com/p/assets/images/images/102/256/184/large/paul-comaita-03.webp?1788946430",
-    ],
-    video: {
-      provider: "youtube",
-      embedUrl: "https://www.youtube-nocookie.com/embed/WHGZ65Y2D3c?rel=0",
-      poster:
-        "https://cdna.artstation.com/p/assets/images/images/102/256/152/large/paul-comaita-01.webp?1788885737",
-      stable: true,
-    },
-    software: ["Blender", "Photoshop", "DaVinci Resolve"],
-    artstationUrl: "https://www.artstation.com/artwork/QxXRaE",
-    featured: true,
-    order: 1,
-  },
-  {
-    id: "mAJAa1",
-    slug: "galaxy-book-presentation",
-    title: "GalaxyBook",
-    year: 2026,
-    category: "Advertising & Product",
     projectType: "Client work",
-    client: ATMOSPHERES,
-    excerpt:
-      "Cinematic 3D product presentation for the Samsung Galaxy Book.",
-    description:
-      "A cinematic 3D presentation for the Samsung Galaxy Book, combining carefully crafted product shots with a full 360° rotation of the laptop. The visual direction draws on luxury design — minimalist, with soft lighting, subtle reflections and a sleek dark setting — to highlight the product's design, materials and elegance in a refined way.",
+    client: { name: ATMOSPHERES.name, url: ATMOSPHERES.url },
+    excerpt: "Pre-launch vertical teaser for YouTube, ahead of the laptop's release.",
     cover:
       "https://cdna.artstation.com/p/assets/covers/images/099/149/014/large/paul-comaita-paul-comaita-samsung.webp?1779111420",
     images: [
@@ -156,22 +99,25 @@ export const projects: Project[] = [
         "https://cdna.artstation.com/p/assets/video_clips/images/098/979/622/large/paul-comaita-thumb.jpg?1778604781",
       stable: false,
     },
-    software: ["Blender", "Photoshop"],
+    software: ["Blender"],
     artstationUrl: "https://www.artstation.com/artwork/mAJAa1",
-    featured: true,
-    order: 2,
+    caseStudy: {
+      context:
+        "Pre-launch vertical video for YouTube presenting the Samsung Galaxy Book 6 ahead of its release. The goal was to highlight the laptop's slim design and its side ports, on a one-month deadline. The full laptop model was built from scratch using the technical specifications and dimensions.",
+      approach:
+        "Complete modeling in Blender. The visual direction was inspired by an existing Samsung laptop ad: a black background with grazing light along the edges. The main challenge was managing several tasks in parallel under a tight schedule.",
+      result: "Broadcast confirmed.",
+      learnings:
+        "Fast production is achievable when the project is well scoped from the start. Running several tasks in parallel is essential on short deadlines.",
+    },
   },
   {
-    id: "04AzG5",
-    slug: "devialet-ads",
-    title: "Devialet Ads",
+    slug: "devialet-mania",
+    title: "Devialet Mania",
+    subtitle: "Luxury Product Ad",
     year: 2024,
-    category: "Advertising & Product",
-    projectType: "Study case",
-    excerpt:
-      "Self-initiated commercial study case for the Devialet Mania speaker.",
-    description:
-      "A commercial for the Devialet Mania speaker, built as a study case — a self-initiated brief treated as if it were a real client commission. Devialet was chosen for its product design language. Modelling, lighting, rendering and grading.",
+    projectType: "Self-initiated project",
+    excerpt: "Self-initiated luxury ad for the Devialet Mania speaker.",
     cover:
       "https://cdna.artstation.com/p/assets/images/images/077/117/140/large/paul-comaita-0018.jpg?1718643555",
     images: [
@@ -182,53 +128,23 @@ export const projects: Project[] = [
     ],
     software: ["Blender", "DaVinci Resolve"],
     artstationUrl: "https://www.artstation.com/artwork/04AzG5",
-    featured: true,
-    order: 3,
-  },
-  {
-    id: "w040dZ",
-    slug: "connexions-short-movie",
-    title: "CONNEXIONS — Short Film",
-    year: 2023,
-    category: "Film & VFX",
-    projectType: "Student film",
-    excerpt: "Graduation short film — director and 3D supervisor.",
-    description:
-      "A short film made during my studies, where I handled both the direction and the 3D supervision. The story follows a robot held in place by a network of connections, kept synchronised and linear alongside the others. An accident breaks the screen binding it, and from that moment it starts moving: it travels through several environments in search of the missing piece, until its connection fully drops and it collapses. The project is built around control, rupture, and what happens when a system loses its grip on something. Technically, it was an opportunity to handle the full 3D pipeline — from modelling to lighting and rendering — while also managing the production as a whole.",
-    cover:
-      "https://cdnb.artstation.com/p/assets/covers/images/067/694/973/large/paul-comaita-paul-comaita-poster-flat01-fotor-20230929125512.jpg?1695988154",
-    images: [
-      "https://cdnb.artstation.com/p/assets/images/images/098/582/093/large/paul-comaita-capture-d-ecran-2026-04-29-141436.webp?1777467436",
-      "https://cdna.artstation.com/p/assets/images/images/098/582/096/large/paul-comaita-capture-d-ecran-2026-04-29-141507.webp?1777467439",
-      "https://cdna.artstation.com/p/assets/images/images/098/584/514/large/paul-comaita-robot.webp?1777471484",
-      "https://cdna.artstation.com/p/assets/images/images/098/584/508/large/paul-comaita-bonhomme.webp?1777471472",
-      "https://cdna.artstation.com/p/assets/images/images/098/584/872/large/paul-comaita-breakdown.webp?1777472060",
-      "https://cdnb.artstation.com/p/assets/images/images/098/587/741/large/paul-comaita-decoupage01.webp?1777477484",
-    ],
-    video: {
-      provider: "youtube",
-      embedUrl: "https://www.youtube-nocookie.com/embed/RP1_e_avPMs?rel=0",
-      poster:
-        "https://cdna.artstation.com/p/assets/videos/images/067/694/034/large/paul-comaita-maxresdefault.jpg?1695986080",
-      stable: true,
+    caseStudy: {
+      context:
+        "Commercial study for the Devialet Mania speaker, chosen for its distinctive design and for an interest in premium audio. The goal was to demonstrate the ability to produce a luxury 3D advertisement. No client.",
+      approach:
+        "Built directly in 3D, without concept or storyboard. Boolean modeling for the speaker's form. The textile effect on the speaker's surface was created with a particle system. Blender for 3D; DaVinci Resolve for editing and color grading.",
+      result: "Completed over three months, part-time.",
+      learnings:
+        "A boolean-based modeling workflow, clean luxury ad staging, and particle systems for surface effects. Next time, the target would be three to four weeks.",
     },
-    software: ["Blender", "Photoshop", "Premiere"],
-    role: "Director & 3D Supervisor",
-    artstationUrl: "https://www.artstation.com/artwork/w040dZ",
-    featured: false,
-    order: 5,
   },
   {
-    id: "2BZnrJ",
-    slug: "corvette-animation",
-    title: "Corvette — Animation",
+    slug: "corvette",
+    title: "Corvette",
+    subtitle: "Automotive Animation",
     year: 2025,
-    category: "Automotive",
     projectType: "Personal project",
-    excerpt:
-      "Automotive animation in high-contrast black and white, wrapped in smoke.",
-    description:
-      "A 3D animation featuring a recent Corvette model in a high-contrast black and white setting. The surrounding smoke creates a mysterious atmosphere that enhances the vehicle's striking lines. Dynamic lighting plays with contrast to reveal the body details, while fluid camera movements capture the car from various angles.",
+    excerpt: "High-contrast black-and-white animation, the car wrapped in smoke.",
     cover:
       "https://cdna.artstation.com/p/assets/images/images/085/015/516/large/paul-comaita-corvette-insta01.jpg?1739785394",
     images: [
@@ -244,128 +160,50 @@ export const projects: Project[] = [
     },
     software: ["Blender", "DaVinci Resolve"],
     artstationUrl: "https://www.artstation.com/artwork/2BZnrJ",
-    featured: true,
-    order: 4,
+    caseStudy: {
+      context:
+        "A complex, realistic model of a Corvette, chosen for its supercar design. The goal was to build a complex, realistic 3D model. References were gathered on Pinterest.",
+      approach:
+        "High-contrast black-and-white look, with the car wrapped in smoke. The smoke was created in Blender using a volumetric noise setup. Modeling and rendering in Blender; editing and color grading in DaVinci Resolve.",
+      result: "Published on Instagram and on the portfolio.",
+      learnings:
+        "Proved the ability to build complex, realistic models on a project that seemed out of reach.",
+    },
   },
   {
-    id: "rJoYze",
-    slug: "corvette-stingray",
-    title: "Corvette Stingray",
-    year: 2024,
-    category: "Automotive",
+    slug: "the-enchained-crown",
+    title: "The Enchained Crown",
+    subtitle: "Cinematic Loop",
+    year: 2026,
     projectType: "Personal project",
-    excerpt: "Still render of a fully self-built Corvette Stingray.",
-    description:
-      "A still render of the Corvette Stingray. Every detail was crafted to capture the line and the elegance of the car. Modelling, texturing, lighting and rendering made entirely by me.",
+    excerpt: "A short 3D cinematic loop of a crown held up by chains.",
     cover:
-      "https://cdna.artstation.com/p/assets/images/images/077/495/610/large/paul-comaita-corvette.jpg?1719586837",
+      "https://cdna.artstation.com/p/assets/images/images/102/256/152/large/paul-comaita-01.webp?1788885737",
     images: [
-      "https://cdna.artstation.com/p/assets/images/images/077/495/610/large/paul-comaita-corvette.jpg?1719586837",
-    ],
-    software: ["Blender", "Photoshop"],
-    artstationUrl: "https://www.artstation.com/artwork/rJoYze",
-    featured: false,
-    order: 6,
-  },
-  {
-    id: "vbwwXd",
-    slug: "gilgamesh-inspired",
-    title: "Gilgamesh Inspired",
-    year: 2025,
-    category: "Film & VFX",
-    projectType: "Personal project",
-    excerpt:
-      "First Unreal Engine animation — focused on cinematography and lighting.",
-    description:
-      "My first 3D animation in Unreal Engine. Not everything was built from scratch: the focus was on cinematography — cameras and lighting — to shape the mood and the storytelling. The goal was to get comfortable with Unreal Engine and explore its potential for animation.",
-    cover:
-      "https://cdna.artstation.com/p/assets/images/images/085/561/650/large/paul-comaita-scene06-0479.jpg?1741100843",
-    images: [
-      "https://cdna.artstation.com/p/assets/images/images/085/561/650/large/paul-comaita-scene06-0479.jpg?1741100843",
+      "https://cdna.artstation.com/p/assets/images/images/102/256/152/large/paul-comaita-01.webp?1788885737",
+      "https://cdna.artstation.com/p/assets/images/images/102/256/164/large/paul-comaita-02.webp?1788885750",
+      "https://cdna.artstation.com/p/assets/images/images/102/256/184/large/paul-comaita-03.webp?1788946430",
     ],
     video: {
       provider: "youtube",
-      embedUrl: "https://www.youtube-nocookie.com/embed/axT1FS8l0KM?rel=0",
+      embedUrl: "https://www.youtube-nocookie.com/embed/WHGZ65Y2D3c?rel=0",
       poster:
-        "https://cdnb.artstation.com/p/assets/videos/images/085/561/463/large/paul-comaita-maxresdefault.jpg?1741100553",
+        "https://cdna.artstation.com/p/assets/images/images/102/256/152/large/paul-comaita-01.webp?1788885737",
       stable: true,
     },
-    software: ["Unreal Engine", "Nuke"],
-    artstationUrl: "https://www.artstation.com/artwork/vbwwXd",
-    featured: false,
-    order: 7,
-  },
-  {
-    id: "6LAez0",
-    slug: "microsoft-logos-animations",
-    title: "Microsoft Logos & Animations",
-    year: 2026,
-    category: "Motion & Assets",
-    projectType: "Client work",
-    client: ATMOSPHERES,
-    excerpt:
-      "Modular 3D Microsoft logos built as reusable video assets.",
-    description:
-      "A set of 3D Microsoft logos designed as modular assets for video production. The work covers modelling, shading and simple animations — fade in/out and looping — allowing quick integration into various content formats. Emphasis was placed on readability, brand fidelity and flexibility of use.",
-    cover:
-      "https://cdnb.artstation.com/p/assets/covers/images/098/830/663/large/paul-comaita-paul-comaita-microsoft.webp?1778168381",
-    images: [
-      "https://cdna.artstation.com/p/assets/images/images/098/830/658/large/paul-comaita-logo.webp?1778168375",
-      "https://cdna.artstation.com/p/assets/images/images/098/589/232/large/paul-comaita-logo-shading.webp?1777480600",
-    ],
-    video: {
-      provider: "artstation",
-      embedUrl:
-        "https://www.artstation.com/api/v2/animation/video_clips/341d0e4f-a0fd-4268-bcf4-ebafc48d57fc/embed.html?s=08111693b3fb94fe76d4d7d893b660197113e0d1df1e617958e72924280e364c&t=1790961058",
-      poster:
-        "https://cdna.artstation.com/p/assets/video_clips/images/098/540/066/large/paul-comaita-thumb.jpg?1777367271",
-      stable: false,
+    software: ["Blender", "DaVinci Resolve"],
+    artstationUrl: "https://www.artstation.com/artwork/QxXRaE",
+    caseStudy: {
+      context:
+        "A short 3D cinematic loop of a crown held up by chains. The project was made as the kind of piece I wanted to see.",
+      approach:
+        "Modeled and rendered in Blender, exported as EXR sequences, then color graded and composited in DaVinci Resolve.",
+      result: "Published on ArtStation and on the portfolio.",
+      learnings: "Being satisfied with my own work, even when the process is not easy.",
     },
-    software: ["Blender", "Photoshop"],
-    artstationUrl: "https://www.artstation.com/artwork/6LAez0",
-    featured: false,
-    order: 8,
-  },
-  {
-    id: "YGNgdP",
-    slug: "hardware-pc-components",
-    title: "Hardware Assets — PC Components",
-    year: 2026,
-    category: "Motion & Assets",
-    projectType: "Client work",
-    client: ATMOSPHERES,
-    excerpt: "Video assets of PC components for content production.",
-    description:
-      "A set of video assets representing computer components — monitor, keyboard, GPU, SSD and more — designed for use in video production. Most base models were sourced from Blender Market; my contribution covers animation, lighting and rendering.",
-    cover:
-      "https://cdna.artstation.com/p/assets/covers/images/098/555/320/large/paul-comaita-paul-comaita-microsoft-components.webp?1777397032",
-    images: [
-      "https://cdnb.artstation.com/p/assets/images/images/098/626/859/large/paul-comaita-keyboard.webp?1777571184",
-      "https://cdna.artstation.com/p/assets/images/images/098/626/858/large/paul-comaita-keyboard-wire.webp?1777571178",
-    ],
-    video: {
-      provider: "artstation",
-      embedUrl:
-        "https://www.artstation.com/api/v2/animation/video_clips/8e41aa8f-6066-4d89-ba48-b2bd24271a5e/embed.html?s=ae184d2bb780cb354de8166b0b8b4c88be27081073757e833a7af0e272cb057c&t=1790961056",
-      poster:
-        "https://cdnb.artstation.com/p/assets/video_clips/images/098/626/815/large/paul-comaita-thumb.jpg?1777571071",
-      stable: false,
-    },
-    software: ["Blender", "Photoshop"],
-    artstationUrl: "https://www.artstation.com/artwork/YGNgdP",
-    featured: false,
-    order: 9,
   },
 ];
 
-/** Homepage selection, in display order. */
-export const featuredProjects = projects
-  .filter((p) => p.featured)
-  .sort((a, b) => a.order - b.order);
-
-/** All projects, newest first. */
-export const allProjectsByDate = [...projects].sort(
-  (a, b) => b.year - a.year || a.order - b.order,
-);
+export const getProject = (slug: string) => projects.find((p) => p.slug === slug);
 
 export default projects;
