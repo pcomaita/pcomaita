@@ -42,17 +42,20 @@ export interface Project {
   year: number;
   category: ProjectCategory;
   projectType: ProjectType;
-  /** One-line summary for the card. */
+  /** One-line summary, shown on the card and at the top of the case study. */
   excerpt: string;
-  /** Full copy for the detail view. */
-  description: string;
+  /** Long-form copy. Only used by projects that are not case studies. */
+  description?: string;
   cover: string;
   images: string[];
   video?: ProjectVideo;
   software: string[];
   /** Only set when projectType === "Client work". */
   client?: ProjectClient;
+  /** Case study bullet 1 — what Paul personally did. */
   role?: string;
+  /** Case study bullet 3. Its presence switches the detail view to the case study layout. */
+  result?: string;
   artstationUrl: string;
   featured: boolean;
   /** Display order among featured projects on the homepage (lower first). */
@@ -64,7 +67,7 @@ export interface ProjectClient {
   name: string;
   url: string;
   /** Where the work was published / what it served. Never implies a direct client relationship. */
-  context: string;
+  context?: string;
   contextUrl?: string;
 }
 
@@ -74,6 +77,15 @@ export const ATMOSPHERES: ProjectClient = {
   url: "https://atmospheres.tm.fr/",
   context: "3D content for the Microsoft ExpertZone France channel",
   contextUrl: "https://www.youtube.com/@ExpertZoneFrance",
+};
+
+/**
+ * Same commissioning agency, credited without naming the distribution channel.
+ * Used on the GalaxyBook case study, where the channel mention was deliberately removed.
+ */
+export const ATMOSPHERES_UNATTRIBUTED: ProjectClient = {
+  name: "Atmosphères",
+  url: "https://atmospheres.tm.fr/",
 };
 
 export const profile = {
@@ -106,15 +118,14 @@ export const projects: Project[] = [
     year: 2026,
     category: "Film & VFX",
     projectType: "Personal project",
-    excerpt: "A short 3D cinematic loop: a crown held up by chains.",
-    description:
-      "A short 3D cinematic loop: a crown held up by chains, light beams cutting through fog, embers floating in the air. It represents ambition under pressure. The crown is the goal; the chains are the effort and sacrifices that never show in the final result; the fire is the drive that pushes forward, but can also burn out. A personal project: no client, no brief.",
+    excerpt:
+      "Short 3D loop of a crown held up by chains, inspired by an artist, about ambition under pressure.",
+    role: "Modeling and rendering in Blender; color grading and compositing in DaVinci Resolve.",
+    result: "Published on ArtStation and on the portfolio.",
     cover:
       "https://cdna.artstation.com/p/assets/images/images/102/256/152/large/paul-comaita-01.webp?1788885737",
     images: [
-      "https://cdna.artstation.com/p/assets/images/images/102/256/152/large/paul-comaita-01.webp?1788885737",
       "https://cdna.artstation.com/p/assets/images/images/102/256/164/large/paul-comaita-02.webp?1788885750",
-      "https://cdna.artstation.com/p/assets/images/images/102/256/184/large/paul-comaita-03.webp?1788946430",
     ],
     video: {
       provider: "youtube",
@@ -135,17 +146,14 @@ export const projects: Project[] = [
     year: 2026,
     category: "Advertising & Product",
     projectType: "Client work",
-    client: ATMOSPHERES,
+    client: ATMOSPHERES_UNATTRIBUTED,
     excerpt:
-      "Cinematic 3D product presentation for the Samsung Galaxy Book.",
-    description:
-      "A cinematic 3D presentation for the Samsung Galaxy Book, combining carefully crafted product shots with a full 360° rotation of the laptop. The visual direction draws on luxury design — minimalist, with soft lighting, subtle reflections and a sleek dark setting — to highlight the product's design, materials and elegance in a refined way.",
+      "Cinematic 360° product presentation of the Samsung Galaxy Book 6, luxury style, delivered in one month.",
+    role: "Full 3D modeling from technical specs; vertical format for YouTube.",
+    result: "Broadcast confirmed.",
     cover:
       "https://cdna.artstation.com/p/assets/covers/images/099/149/014/large/paul-comaita-paul-comaita-samsung.webp?1779111420",
     images: [
-      "https://cdna.artstation.com/p/assets/images/images/099/013/586/original/paul-comaita-silhouette.gif?1778688997",
-      "https://cdnb.artstation.com/p/assets/images/images/099/011/297/original/paul-comaita-screens-connectiques.gif?1778684316",
-      "https://cdnb.artstation.com/p/assets/images/images/099/013/583/original/paul-comaita-front.gif?1778688991",
       "https://cdna.artstation.com/p/assets/images/images/099/013/644/large/paul-comaita-dessous.webp?1778689091",
     ],
     video: {
@@ -169,16 +177,13 @@ export const projects: Project[] = [
     category: "Advertising & Product",
     projectType: "Study case",
     excerpt:
-      "Self-initiated commercial study case for the Devialet Mania speaker.",
-    description:
-      "A commercial for the Devialet Mania speaker, built as a study case — a self-initiated brief treated as if it were a real client commission. Devialet was chosen for its product design language. Modelling, lighting, rendering and grading.",
+      "Luxury product advertisement for the Devialet Mania speaker, built without a client brief.",
+    role: "Modeling (booleans), lighting, rendering; particle-based textile effect; editing and grading.",
+    result: "Completed in three months, part-time.",
     cover:
       "https://cdna.artstation.com/p/assets/images/images/077/117/140/large/paul-comaita-0018.jpg?1718643555",
     images: [
-      "https://cdna.artstation.com/p/assets/images/images/077/117/140/large/paul-comaita-0018.jpg?1718643555",
       "https://cdnb.artstation.com/p/assets/images/images/077/117/157/large/paul-comaita-0054.jpg?1718643592",
-      "https://cdna.artstation.com/p/assets/images/images/077/122/904/large/paul-comaita-0153.jpg?1718653653",
-      "https://cdna.artstation.com/p/assets/images/images/090/361/088/large/paul-comaita-template.jpg?1753713073",
     ],
     software: ["Blender", "DaVinci Resolve"],
     artstationUrl: "https://www.artstation.com/artwork/04AzG5",
@@ -226,14 +231,13 @@ export const projects: Project[] = [
     category: "Automotive",
     projectType: "Personal project",
     excerpt:
-      "Automotive animation in high-contrast black and white, wrapped in smoke.",
-    description:
-      "A 3D animation featuring a recent Corvette model in a high-contrast black and white setting. The surrounding smoke creates a mysterious atmosphere that enhances the vehicle's striking lines. Dynamic lighting plays with contrast to reveal the body details, while fluid camera movements capture the car from various angles.",
+      "High-contrast black-and-white animation of a Corvette wrapped in volumetric smoke.",
+    role: "Complex, realistic car model; smoke built in Blender; lighting and camera moves.",
+    result: "Published on Instagram and on the portfolio.",
     cover:
       "https://cdna.artstation.com/p/assets/images/images/085/015/516/large/paul-comaita-corvette-insta01.jpg?1739785394",
     images: [
       "https://cdna.artstation.com/p/assets/images/images/085/015/516/large/paul-comaita-corvette-insta01.jpg?1739785394",
-      "https://cdna.artstation.com/p/assets/images/images/090/457/806/large/paul-comaita-corvette-maps.webp?1753968327",
     ],
     video: {
       provider: "youtube",

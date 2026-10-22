@@ -249,8 +249,16 @@ export function ProjectModal({
           </h3>
           {project.client && <ClientLine client={project.client} />}
 
+          <p className="mt-4 max-w-2xl text-sm font-light leading-relaxed text-foreground/85 sm:text-base">
+            {project.excerpt}
+          </p>
+
           {project.images.length > 0 && (
-            <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <div
+              className={`mt-6 grid grid-cols-1 gap-3 ${
+                project.images.length > 1 ? "sm:grid-cols-2" : ""
+              }`}
+            >
               {project.images.map((src, i) => (
                 <img
                   key={src}
@@ -263,25 +271,55 @@ export function ProjectModal({
             </div>
           )}
 
-          <p className="mt-6 max-w-2xl text-sm font-light leading-relaxed text-muted-foreground sm:text-base">
-            {project.description}
-          </p>
-          {project.role && (
-            <p className="mt-4 text-sm font-light text-foreground/85">
-              Role: {project.role}
-            </p>
+          {project.result ? (
+            <dl className="mt-6 max-w-2xl space-y-3 text-sm font-light sm:text-base">
+              {project.role && (
+                <div>
+                  <dt className="inline text-[11px] tracking-[0.18em] uppercase text-primary">
+                    Role
+                  </dt>
+                  <dd className="mt-1 text-muted-foreground">{project.role}</dd>
+                </div>
+              )}
+              <div>
+                <dt className="inline text-[11px] tracking-[0.18em] uppercase text-primary">
+                  Tools
+                </dt>
+                <dd className="mt-1 text-muted-foreground">
+                  {project.software.join(", ")}
+                </dd>
+              </div>
+              <div>
+                <dt className="inline text-[11px] tracking-[0.18em] uppercase text-primary">
+                  Result
+                </dt>
+                <dd className="mt-1 text-muted-foreground">{project.result}</dd>
+              </div>
+            </dl>
+          ) : (
+            <>
+              {project.description && (
+                <p className="mt-6 max-w-2xl text-sm font-light leading-relaxed text-muted-foreground sm:text-base">
+                  {project.description}
+                </p>
+              )}
+              {project.role && (
+                <p className="mt-4 text-sm font-light text-foreground/85">
+                  Role: {project.role}
+                </p>
+              )}
+              <div className="mt-6 flex flex-wrap gap-2">
+                {project.software.map((tool) => (
+                  <span
+                    key={tool}
+                    className="rounded-full border border-border bg-background px-3.5 py-1.5 text-[12px] font-light text-muted-foreground"
+                  >
+                    {tool}
+                  </span>
+                ))}
+              </div>
+            </>
           )}
-
-          <div className="mt-6 flex flex-wrap gap-2">
-            {project.software.map((tool) => (
-              <span
-                key={tool}
-                className="rounded-full border border-border bg-background px-3.5 py-1.5 text-[12px] font-light text-muted-foreground"
-              >
-                {tool}
-              </span>
-            ))}
-          </div>
 
           <a
             href={project.artstationUrl}
