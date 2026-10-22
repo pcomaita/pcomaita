@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { Reveal } from "@/components/Reveal";
 import { ProjectModal } from "@/components/site";
-import { BLENDER_PATH, DAVINCI_RESOLVE_PATH, NUKE_PATH } from "@/components/tool-icon-paths";
-import { projects, type Project } from "@/data/projects";
+import { BLENDER_PATH, DAVINCI_RESOLVE_PATH } from "@/components/tool-icon-paths";
+import { featuredProjects, type Project } from "@/data/projects";
 
 type StepId = "modeling" | "texturing" | "animation" | "lighting" | "compositing" | "editing";
 
@@ -30,7 +30,7 @@ const TOOLS: Tool[] = [
     role: "Main 3D tool",
     steps: ["modeling", "texturing", "animation", "lighting"],
     description:
-      "Modeling, shading, animation, lighting and rendering. Most projects on this site are built and rendered in Blender.",
+      "Modeling, shading, animation, lighting and rendering. Every project on this site is built and rendered in Blender.",
     icon: { path: BLENDER_PATH },
   },
   {
@@ -41,17 +41,11 @@ const TOOLS: Tool[] = [
     icon: { letters: "Ps" },
   },
   {
-    name: "Nuke",
-    role: "Compositing",
-    steps: ["compositing"],
-    description: "Compositing render passes into the final image.",
-    icon: { path: NUKE_PATH },
-  },
-  {
     name: "DaVinci Resolve",
-    role: "Edit & grade",
-    steps: ["editing"],
-    description: "Editing, color grading and final delivery of my films.",
+    role: "Compositing, edit & grade",
+    steps: ["compositing", "editing"],
+    description:
+      "Compositing of my renders, then editing, color grading and final delivery of my films.",
     icon: { path: DAVINCI_RESOLVE_PATH },
   },
 ];
@@ -79,7 +73,7 @@ export function Expertise() {
   const [openProject, setOpenProject] = useState<Project | null>(null);
 
   const tool: Tool = TOOLS.find((t) => t.name === active) ?? (TOOLS[0] as Tool);
-  const usedIn = projects
+  const usedIn = featuredProjects
     .filter((p) => p.software.includes(tool.name))
     .sort((a, b) => b.year - a.year || a.order - b.order);
 
@@ -92,7 +86,7 @@ export function Expertise() {
             How I work
           </h3>
           <p className="mt-4 max-w-xl text-[15px] font-light text-muted-foreground">
-            One pipeline, four tools — from the first polygon to the final grade.
+            One pipeline, three tools — from the first polygon to the final grade.
           </p>
         </Reveal>
 
@@ -136,7 +130,7 @@ export function Expertise() {
         {/* Tools */}
         <Reveal delay={200}>
           <div
-            className="mt-12 grid grid-cols-2 gap-3 lg:grid-cols-4 lg:gap-4"
+            className="mt-12 grid grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4"
             role="group"
             aria-label="Tools — select one to see where it fits in the pipeline"
           >
