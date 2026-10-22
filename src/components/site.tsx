@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { Link } from "@tanstack/react-router";
 import { ArrowUpRight, Lightbulb, LightbulbOff, Play, X } from "lucide-react";
 import { Reveal } from "@/components/Reveal";
 import {
@@ -12,7 +11,6 @@ import {
 
 export const NAV_LINKS = [
   { label: "Home", href: "/" },
-  { label: "Work", href: "/work" },
   { label: "About", href: "/#about" },
   { label: "Contact", href: "/#contact" },
 ];
@@ -111,21 +109,12 @@ export function SiteNav({ overHero = false }: { overHero?: boolean }) {
         <ul className="flex items-center gap-3 sm:gap-8">
           {NAV_LINKS.map((link) => (
             <li key={link.href} className="hidden sm:block">
-              {link.href === "/work" ? (
-                <Link
-                  to="/work"
-                  className="text-[13px] font-normal tracking-[0.14em] uppercase text-muted-foreground transition-colors hover:text-foreground"
-                >
-                  {link.label}
-                </Link>
-              ) : (
-                <a
-                  href={link.href}
-                  className="text-[13px] font-normal tracking-[0.14em] uppercase text-muted-foreground transition-colors hover:text-foreground"
-                >
-                  {link.label}
-                </a>
-              )}
+              <a
+                href={link.href}
+                className="text-[13px] font-normal tracking-[0.14em] uppercase text-muted-foreground transition-colors hover:text-foreground"
+              >
+                {link.label}
+              </a>
             </li>
           ))}
           <li>

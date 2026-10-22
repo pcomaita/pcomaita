@@ -1,6 +1,6 @@
 // Projects are loaded from src/data/projects.ts
 import { useEffect, useRef, useState } from "react";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { ArrowDown } from "lucide-react";
 import { Reveal } from "@/components/Reveal";
 import { ATMOSPHERES, featuredProjects, profile } from "@/data/projects";
@@ -152,15 +152,6 @@ function Portfolio() {
 
         <ProjectGrid items={featuredProjects} columns={2} />
 
-        <div className="mt-16 flex justify-center">
-          <Link
-            to="/work"
-            className="group inline-flex items-center gap-3 rounded-full bg-foreground px-7 py-3 text-sm font-medium tracking-wide text-background transition-all hover:bg-primary hover:text-primary-foreground"
-          >
-            View all projects
-            <span aria-hidden="true" className="transition-transform group-hover:translate-x-0.5">→</span>
-          </Link>
-        </div>
       </div>
     </section>
   );
