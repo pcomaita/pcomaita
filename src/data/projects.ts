@@ -185,6 +185,14 @@ export const projects: Project[] = [
     images: [
       "https://cdnb.artstation.com/p/assets/images/images/077/117/157/large/paul-comaita-0054.jpg?1718643592",
     ],
+    video: {
+      provider: "youtube",
+      // end=10 stops playback at 10s — the rest of the upload is not shown.
+      embedUrl: "https://www.youtube-nocookie.com/embed/k6P8GC2O91Y?rel=0&end=10",
+      poster:
+        "https://cdna.artstation.com/p/assets/images/images/077/117/140/large/paul-comaita-0018.jpg?1718643555",
+      stable: true,
+    },
     software: ["Blender", "DaVinci Resolve"],
     artstationUrl: "https://www.artstation.com/artwork/04AzG5",
     featured: true,
