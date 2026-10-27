@@ -241,6 +241,42 @@ html.light .shadow-soft {
   z-index: 1;
 }
 
+/* Contact glow.
+
+   A large blurred solid circle bands badly: an 8-bit-per-channel buffer has
+   too few steps to render a wide, low-contrast falloff in a dark colour, and
+   the blur also leaves the circle's edge visible as an arc. A multi-stop
+   radial gradient eases to full transparency instead, so there is no edge and
+   far less stepping. The grain overlay above it dithers whatever remains. */
+.contact-glow {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 0;
+  width: min(1100px, 170vw);
+  aspect-ratio: 1 / 1;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  background: radial-gradient(
+    circle closest-side,
+    color-mix(in oklab, var(--primary) 13%, transparent) 0%,
+    color-mix(in oklab, var(--primary) 11.5%, transparent) 14%,
+    color-mix(in oklab, var(--primary) 9%, transparent) 28%,
+    color-mix(in oklab, var(--primary) 6.5%, transparent) 42%,
+    color-mix(in oklab, var(--primary) 4.2%, transparent) 56%,
+    color-mix(in oklab, var(--primary) 2.4%, transparent) 70%,
+    color-mix(in oklab, var(--primary) 1.1%, transparent) 83%,
+    color-mix(in oklab, var(--primary) 0.4%, transparent) 93%,
+    transparent 100%
+  );
+}
+
+/* The grain has to sit above the glow to dither it — painted underneath it
+   would smooth nothing. The section's content is lifted above both. */
+#contact.grain::before {
+  z-index: 1;
+}
+
 /* About section background, reused by the sticky experience dates so they
    hide the content scrolling underneath (same color as the old bg-surface/40). */
 .about-bg {

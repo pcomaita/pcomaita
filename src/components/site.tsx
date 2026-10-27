@@ -429,8 +429,8 @@ export function Contact() {
       id="contact"
       className="grain relative w-full overflow-hidden border-t border-border/60"
     >
-      <div className="pointer-events-none absolute left-1/2 top-1/2 size-[560px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/10 blur-[140px]" />
-      <div className="relative mx-auto flex w-full max-w-4xl flex-col items-center px-6 py-32 text-center lg:py-44">
+      <div className="contact-glow" />
+      <div className="relative z-[2] mx-auto flex w-full max-w-4xl flex-col items-center px-6 py-32 text-center lg:py-44">
         <Reveal>
           <p className="text-[12px] tracking-[0.35em] uppercase text-primary">
             Contact
